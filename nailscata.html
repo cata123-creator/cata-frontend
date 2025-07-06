@@ -735,7 +735,7 @@ appointmentForm.addEventListener('submit', async function (event) {
 
         const result = await response.json();
 
-        if (result.success) {
+        if (response.ok) {
             this.reset();
             selectedDateInput.value = '';
             selectedTimeInput.value = '';
