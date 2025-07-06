@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NailsCata - Gestión de Turnos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #fce4ec; /* Light pink background */
+        }
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 25px;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(236, 72, 153, 0.1); /* Pink shadow */
+        }
+        h1 {
+            color: #d81b60; /* Darker pink */
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .table-container {
+            overflow-x: auto;
+            border: 1px solid #fbcfe8; /* Light pink border */
+            border-radius: 8px;
+            background-color: #fff;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #fbcfe8; /* Light pink border */
+            color: #4a4a4a;
+        }
+        th {
+            background-color: #f8bbd0; /* Medium pink */
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.9em;
+        }
+        tr:nth-child(even) {
+            background-color: #fdf2f8; /* Very light pink */
+        }
+        .action-btn {
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .delete-btn {
+            background-color: #ef4444; /* Red */
+            color: white;
+        }
+        .delete-btn:hover {
+            background-color: #dc2626; /* Darker red */
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(239, 68, 68, 0.2);
+        }
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+            font-weight: 500;
+            font-size: 1.1em;
+        }
+        .message.success {
+            background-color: #d1fae5; /* Light green */
+            color: #065f46; /* Dark green */
+        }
+        .message.error {
+            background-color: #fee2e2; /* Light red */
+            color: #991b1b; /* Dark red */
+        }
+        .loading-spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #ec4899; /* Pink */
+            animation: spin 1s ease infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Gestión de Turnos NailsCata</h1>
+        
+        <div id="loading" class="loading-spinner hidden"></div>
+        <div id="messageArea" class="message hidden"></div>
+
+        <div class="table-container">
+            <table id="appointmentsTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Fecha</th>
+                        <th>Hora</th>
+                        <th>Servicio</th>
+                        <th>Nombre</th>
+                        <th>Email</th>
+                        <th>Mensaje</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    </tbody>
+            </table>
+        </div>
+        <p id="noAppointments" class="text-center text-gray-500 mt-4 hidden">No hay turnos agendados.</p>
+    </div>
+
+    <script>
+        // URL de tu backend en Render
+        const API_URL = 'https://cata-backend-5z45.onrender.com/api/appointments'; // ¡ASEGÚRATE DE QUE SEA LA URL CORRECTA!
+
+        const appointmentsTableBody = document.querySelector('#appointmentsTable tbody');
+        const loadingSpinner = document.getElementById('loading');
+        const messageArea = document.getElementById('messageArea');
+        const noAppointmentsMessage = document.getElementById('noAppointments');
+
+        // Función para mostrar mensajes
+        function showMessage(msg, type) {
+            messageArea.textContent = msg;
+            messageArea.className = `message ${type}`; // 'success' or 'error'
+            messageArea.classList.remove('hidden');
+            setTimeout(() => {
+                messageArea.classList.add('hidden');
+            }, 5000); // Ocultar después de 5 segundos
+        }
+
+        // Función para cargar y mostrar los turnos
+        async function fetchAppointments() {
+            loadingSpinner.classList.remove('hidden');
+            appointmentsTableBody.innerHTML = ''; // Limpiar tabla
+            noAppointmentsMessage.classList.add('hidden'); // Ocultar mensaje de no turnos
+            
+            try {
+                const response = await fetch(API_URL);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+
+                if (data.reservedSlots && data.reservedSlots.length > 0) {
+                    data.reservedSlots.forEach(appointment => {
+                        const row = appointmentsTableBody.insertRow();
+                        row.innerHTML = `
+                            <td>${appointment.id}</td>
+                            <td>${appointment.fecha}</td>
+                            <td>${appointment.hora}</td>
+                            <td>${appointment.servicio}</td>
+                            <td>${appointment.nombre}</td>
+                            <td>${appointment.email}</td>
+                            <td>${appointment.message || '-'}</td>
+                            <td>
+                                <button class="action-btn delete-btn" data-id="${appointment.id}">Eliminar</button>
+                            </td>
+                        `;
+                    });
+                } else {
+                    noAppointmentsMessage.classList.remove('hidden');
+                }
+
+            } catch (error) {
+                console.error('Error al cargar turnos:', error);
+                showMessage('Error al cargar los turnos. Intenta de nuevo más tarde.', 'error');
+            } finally {
+                loadingSpinner.classList.add('hidden');
+            }
+        }
+
+        // Función para eliminar un turno
+        async function deleteAppointment(id) {
+            if (!confirm('¿Estás seguro de que quieres eliminar este turno? Esta acción no se puede deshacer.')) {
+                return; // Si el usuario cancela, no hacemos nada
+            }
+
+            loadingSpinner.classList.remove('hidden');
+            try {
+                const response = await fetch(`${API_URL}/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+                }
+
+                showMessage('Turno eliminado con éxito.', 'success');
+                fetchAppointments(); // Volver a cargar los turnos para actualizar la tabla
+
+            } catch (error) {
+                console.error('Error al eliminar turno:', error);
+                showMessage(`Error al eliminar turno: ${error.message}.`, 'error');
+            } finally {
+                loadingSpinner.classList.add('hidden');
+            }
+        }
+
+        // Delegación de eventos para los botones de eliminar
+        appointmentsTableBody.addEventListener('click', (event) => {
+            if (event.target.classList.contains('delete-btn')) {
+                const idToDelete = event.target.dataset.id;
+                deleteAppointment(idToDelete);
+            }
+        });
+
+        // Cargar turnos al cargar la página
+        document.addEventListener('DOMContentLoaded', fetchAppointments);
+    </script>
+</body>
+</html>
