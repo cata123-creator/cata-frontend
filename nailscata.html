@@ -561,7 +561,7 @@
         async function fetchOccupiedSlots() {
             try {
                 // Ensure this URL is correct for your Render backend
-                const response = await fetch('https://nailscata-back-production.up.railway.app/appointments');
+                const response = await fetch('https://cata-backend-5z45.onrender.com/api/appointments');
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -769,7 +769,7 @@
                 };
 
                 try {
-                    const response = await fetch('https://cata-backend-5z45.onrender.com', {
+                    const response = await fetch('https://cata-backend-5z45.onrender.com/api/appointments', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
