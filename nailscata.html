@@ -171,6 +171,41 @@
             background-color: #e0e0e0;
             transform: none;
         }
+
+        /* NEW CSS FOR RESPONSIVE CALENDAR */
+        .calendar-responsive-wrapper {
+            width: 100%; /* Ensure it takes full width */
+            overflow-x: auto; /* Allows horizontal scrolling if content is too wide */
+            -webkit-overflow-scrolling: touch; /* For smoother scrolling on iOS */
+        }
+
+        /* Adjust calendar grid for small screens */
+        @media (max-width: 768px) {
+            .calendar-grid {
+                /* Ensure columns have a minimum width, allowing grid to expand and be scrollable */
+                grid-template-columns: repeat(7, minmax(40px, 1fr)); 
+                font-size: 0.9em; /* Slightly smaller font */
+            }
+            .calendar-day {
+                padding: 5px; /* Reduce padding */
+            }
+            .calendar-grid > div { /* Target day names (Lun, Mar, etc.) */
+                padding: 5px; /* Adjust padding for day names too */
+            }
+        }
+
+        @media (max-width: 480px) {
+            .calendar-grid {
+                grid-template-columns: repeat(7, minmax(35px, 1fr)); /* Even smaller minimum width */
+                font-size: 0.8em; /* Further reduce font size */
+            }
+            .calendar-day {
+                padding: 4px; /* Further reduce padding */
+            }
+            .calendar-grid > div {
+                padding: 4px; /* Adjust padding for day names */
+            }
+        }
     </style>
 </head>
 <body class="font-sans bg-pink-50">
@@ -300,35 +335,37 @@
                         <div class="space-y-4">
                             <label class="block text-gray-700 text-sm font-bold mb-2">Selecciona Fecha y Hora:</label>
                             
-                            <div class="flex justify-between items-center bg-pink-100 p-3 rounded-t-lg">
-                                <button type="button" id="prevMonth" class="text-pink-600 hover:text-pink-800 transition duration-300">
-                                    <i class="fas fa-chevron-left"></i>
-                                </button>
-                                <span id="currentMonthYear" class="font-bold text-gray-800 text-lg"></span>
-                                <button type="button" id="nextMonth" class="text-pink-600 hover:text-pink-800 transition duration-300">
-                                    <i class="fas fa-chevron-right"></i>
-                                </button>
-                            </div>
-
-                            <div class="calendar-grid text-gray-600 font-semibold text-sm">
-                                <div class="text-center">Lun</div>
-                                <div class="text-center">Mar</div>
-                                <div class="text-center">Mié</div>
-                                <div class="text-center">Jue</div>
-                                <div class="text-center">Vie</div>
-                                <div class="text-center">Sáb</div>
-                                <div class="text-center">Dom</div>
-                            </div>
-
-                            <div id="calendar" class="calendar-grid bg-white rounded-b-lg p-3 shadow-inner border border-gray-200">
+                            <div class="calendar-responsive-wrapper">
+                                <div class="flex justify-between items-center bg-pink-100 p-3 rounded-t-lg">
+                                    <button type="button" id="prevMonth" class="text-pink-600 hover:text-pink-800 transition duration-300">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </button>
+                                    <span id="currentMonthYear" class="font-bold text-gray-800 text-lg"></span>
+                                    <button type="button" id="nextMonth" class="text-pink-600 hover:text-pink-800 transition duration-300">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </button>
                                 </div>
+
+                                <div class="calendar-grid text-gray-600 font-semibold text-sm">
+                                    <div class="text-center">Lun</div>
+                                    <div class="text-center">Mar</div>
+                                    <div class="text-center">Mié</div>
+                                    <div class="text-center">Jue</div>
+                                    <div class="text-center">Vie</div>
+                                    <div class="text-center">Sáb</div>
+                                    <div class="text-center">Dom</div>
+                                </div>
+
+                                <div id="calendar" class="calendar-grid bg-white rounded-b-lg p-3 shadow-inner border border-gray-200">
+                                </div>
+                            </div>
                             <input type="hidden" id="selectedDate" name="selectedDate" required>
                             <p id="dateError" class="text-red-500 text-xs italic hidden">Por favor, selecciona una fecha.</p>
 
                             <div class="mt-6">
                                 <p class="block text-gray-700 text-sm font-bold mb-3">Horarios disponibles para <span id="displaySelectedDate" class="font-semibold text-pink-600">la fecha seleccionada</span>:</p>
                                 <div id="timeSlots" class="grid grid-cols-3 md:grid-cols-4 gap-3">
-                                    </div>
+                                </div>
                                 <input type="hidden" id="selectedTime" name="selectedTime" required>
                                 <p id="timeError" class="text-red-500 text-xs italic hidden">Por favor, selecciona un horario.</p>
                             </div>
@@ -402,9 +439,7 @@
                             </div>
                         </div>
                         <h3 class="text-2xl font-bold mb-3 text-center text-gray-800">Pestañas Impactantes</h3>
-                        <p class="text-gray-600 mb-6 text-center text-lg">
-                            Mira al mundo con unos <span class="font-medium text-pink-500">ojos deslumbrantes</span>
-                        </p>
+                        <p class="text-gray-600 mb-6 text-center text-lg"> Mira al mundo con unos <span class="font-medium text-pink-500">ojos deslumbrantes</span> </p>
                         <div class="flex justify-center mb-6">
                             <img src="Imagen de WhatsApp 2025-07-05 a las 11.23.18_7e5836c2.jpg" alt="Pestañas" class="rounded-lg transform hover:scale-105 transition-transform">
                         </div>
@@ -416,62 +451,47 @@
                         </ul>
                     </div>
                 </div>
-            </div> </div> </section> <section id="galeria" class="py-16 bg-white">
+            </div>
+        </div>
+    </section>
+
+    <section id="galeria" class="py-16 bg-white">
         <div class="container mx-auto px-4">
             <h2 class="text-3xl font-bold text-center mb-16 text-gray-800">Nuestros Trabajos</h2>
-            
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                
                 <div class="relative group overflow-hidden rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 h-80 before:absolute before:inset-0 before:bg-gradient-to-t before:from-black/70 before:via-transparent before:to-transparent before:opacity-0 before:group-hover:opacity-100 before:transition-opacity before:duration-500">
-                    <img src="Imagen de WhatsApp 2025-07-05 a las 10.40.22_513ef2ba.jpg" 
-                        alt="Manicura profesional con diseño floral" 
-                        class="absolute w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 group-hover:rotate-1">
+                    <img src="Imagen de WhatsApp 2025-07-05 a las 10.40.22_513ef2ba.jpg" alt="Manicura profesional con diseño floral" class="absolute w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 group-hover:rotate-1">
                     <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-pink-200/30 via-transparent to-transparent opacity:0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity:0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-6">
                     </div>
                 </div>
-                
-                <div class="relative group overflow-hidden rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 h-80 before:absolute before:inset-0 before:bg-gradient-to-t before:from-black/70 before:via-transparent before:to-transparent before:opacity:0 before:group-hover:opacity-100 before:transition-opacity before:duration-500">
-                    <img src="Imagen de WhatsApp 2025-07-05 a las 10.40.22_67e3870c.jpg" 
-                        alt="Diseño de uñas estilo mármol con tonos dorados y detalles geométricos" 
-                        class="absolute w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 group-hover:rotate-1">
+                <div class="relative group overflow-hidden rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 h-80 before:absolute before:inset-0 before:bg-gradient-to-t before:from-black/70 before:via-transparent before:to-transparent before:opacity-0 before:group-hover:opacity-100 before:transition-opacity before:duration-500">
+                    <img src="Imagen de WhatsApp 2025-07-05 a las 10.40.22_73a246a0.jpg" alt="Uñas esculpidas con detalles de pedrería" class="absolute w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 group-hover:rotate-1">
                     <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-pink-200/30 via-transparent to-transparent opacity:0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity:0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-6">
                     </div>
                 </div>
-                
-                <div class="relative group overflow-hidden rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 h-80 before:absolute before:inset-0 before:bg-gradient-to-t before:from-black/70 before:via-transparent before:to-transparent before:opacity:0 before:group-hover:opacity-100 before:transition-opacity before:duration-500">
-                    <img src="Imagen de WhatsApp 2025-07-05 a las 10.40.21_70786d6c.jpg" 
-                        alt="Extensiones de pestañas volumen ruso con efecto de cat eye" 
-                        class="absolute w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 group-hover:rotate-1">
+                <div class="relative group overflow-hidden rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 h-80 before:absolute before:inset-0 before:bg-gradient-to-t before:from-black/70 before:via-transparent before:to-transparent before:opacity-0 before:group-hover:opacity-100 before:transition-opacity before:duration-500">
+                    <img src="Imagen de WhatsApp 2025-07-05 a las 10.40.23_c287a933.jpg" alt="Diseño de uñas con esmalte de gel y acabado brillante" class="absolute w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 group-hover:rotate-1">
                     <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-pink-200/30 via-transparent to-transparent opacity:0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity:0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-6">
                     </div>
                 </div>
-                
-                <div class="relative group overflow-hidden rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 h-80 before:absolute before:inset-0 before:bg-gradient-to-t before:from-black/70 before:via-transparent before:to-transparent before:opacity:0 before:group-hover:opacity-100 before:transition-opacity before:duration-500">
-                    <img src="Imagen de WhatsApp 2025-07-05 a las 10.40.22_ec92f7a2.jpg" 
-                        alt="Pedicura profesional con esmalte en tono nude mate" 
-                        class="absolute w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 group-hover:rotate-1">
+                <div class="relative group overflow-hidden rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 h-80 before:absolute before:inset-0 before:bg-gradient-to-t before:from-black/70 before:via-transparent before:to-transparent before:opacity-0 before:group-hover:opacity-100 before:transition-opacity before:duration-500">
+                    <img src="Imagen de WhatsApp 2025-07-05 a las 10.40.23_65084920.jpg" alt="Pestañas voluminosas y bien definidas" class="absolute w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 group-hover:rotate-1">
                     <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-pink-200/30 via-transparent to-transparent opacity:0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity:0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-6">
                     </div>
                 </div>
-                
-                <div class="relative group overflow-hidden rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 h-80 before:absolute before:inset-0 before:bg-gradient-to-t before:from-black/70 before:via-transparent before:to-transparent before:opacity:0 before:group-hover:opacity-100 before:transition-opacity before:duration-500">
-                    <img src="Imagen de WhatsApp 2025-07-05 a las 10.40.22_373dd8af.jpg"
-                        alt="Uñas largas estilo cristal con glitter e incrustaciones"
-                        class="absolute w-full h-full object-cover object-bottom transition-transform duration-700 group-hover:scale-110 group-hover:rotate-1">
+                <div class="relative group overflow-hidden rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 h-80 before:absolute before:inset-0 before:bg-gradient-to-t before:from-black/70 before:via-transparent before:to-transparent before:opacity-0 before:group-hover:opacity-100 before:transition-opacity before:duration-500">
+                    <img src="Imagen de WhatsApp 2025-07-05 a las 10.40.23_b6e415fb.jpg" alt="Manicura francesa clásica con un toque moderno" class="absolute w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 group-hover:rotate-1">
                     <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-pink-200/30 via-transparent to-transparent opacity:0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity:0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-6">
                     </div>
                 </div>
-                
-                <div class="relative group overflow-hidden rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 h-80 before:absolute before:inset-0 before:bg-gradient-to-t before:from-black/70 before:via-transparent before:to-transparent before:opacity:0 before:group-hover:opacity-100 before:transition-opacity before:duration-500">
-                    <img src="Imagen de WhatsApp 2025-07-05 a las 10.40.23_3b1b4b34.jpg" 
-                        alt="Pestañas naturales con lifting y tinte para un look intensificado" 
-                        class="absolute w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 group-hover:rotate-1">
-                    <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-pink-200/30 via-transparent to-transparent opacity:0 group-hover:opacity:100 transition-opacity duration-500"></div>
+                <div class="relative group overflow-hidden rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 h-80 before:absolute before:inset-0 before:bg-gradient-to-t before:from-black/70 before:via-transparent before:to-transparent before:opacity-0 before:group-hover:opacity-100 before:transition-opacity before:duration-500">
+                    <img src="Imagen de WhatsApp 2025-07-05 a las 10.40.23_761765c9.jpg" alt="Diseño de uñas vibrante con colores de temporada" class="absolute w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 group-hover:rotate-1">
+                    <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-pink-200/30 via-transparent to-transparent opacity:0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity:0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-6">
                     </div>
                 </div>
@@ -479,24 +499,16 @@
         </div>
     </section>
 
-    <footer class="bg-gray-800 text-white py-12">
+    <footer class="bg-gradient-to-r from-pink-500 to-rose-500 text-white py-12">
         <div class="container mx-auto px-4 text-center">
-            <div class="mb-8">
-                <span class="font-semibold text-pink-400 text-3xl">NailsCata</span>
-                <p class="text-gray-400 mt-2">Transformando tu belleza, una uña a la vez.</p>
-            </div>
-            
+            <h3 class="text-3xl font-bold mb-6">NailsCata</h3>
             <div class="flex justify-center space-x-6 mb-8">
-                <a href="#" class="text-gray-400 hover:text-pink-400 transition-colors duration-300"><i class="fab fa-facebook-f text-2xl"></i></a>
-                <a href="#" class="text-gray-400 hover:text-pink-400 transition-colors duration-300"><i class="fab fa-instagram text-2xl"></i></a>
-                <a href="#" class="text-gray-400 hover:text-pink-400 transition-colors duration-300"><i class="fab fa-whatsapp text-2xl"></i></a>
-                <a href="#" class="text-gray-400 hover:text-pink-400 transition-colors duration-300"><i class="fas fa-envelope text-2xl"></i></a>
+                <a href="#" class="text-white hover:text-pink-200 transition duration-300 transform hover:scale-110"><i class="fab fa-facebook-f text-2xl"></i></a>
+                <a href="#" class="text-white hover:text-pink-200 transition duration-300 transform hover:scale-110"><i class="fab fa-instagram text-2xl"></i></a>
+                <a href="#" class="text-white hover:text-pink-200 transition duration-300 transform hover:scale-110"><i class="fab fa-whatsapp text-2xl"></i></a>
             </div>
-
-            <div class="text-gray-500 text-sm">
-                <p>&copy; 2025 NailsCata. Todos los derechos reservados.</p>
-                <p>Diseñado con <span class="text-pink-500">&hearts;</span> para resaltar tu estilo.</p>
-            </div>
+            <p class="text-lg mb-4">&copy; 2025 NailsCata. Todos los derechos reservados.</p>
+            <p class="text-md">Diseñado con <i class="fas fa-heart text-red-400 mx-1"></i> por Cata Developer.</p>
         </div>
     </footer>
 
@@ -509,228 +521,169 @@
             menu.classList.toggle('hidden');
         });
 
-        // Smooth scrolling for navigation links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
-                // Hide mobile menu after clicking a link
-                if (!menu.classList.contains('hidden')) {
-                    menu.classList.add('hidden');
-                }
+        // Close mobile menu on link click
+        menu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                menu.classList.add('hidden');
             });
         });
 
-        // Calendar Logic
+        // Smooth scroll for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Dynamic Calendar and Appointment Form Logic
         const calendarEl = document.getElementById('calendar');
         const currentMonthYearEl = document.getElementById('currentMonthYear');
         const prevMonthBtn = document.getElementById('prevMonth');
         const nextMonthBtn = document.getElementById('nextMonth');
         const selectedDateInput = document.getElementById('selectedDate');
         const displaySelectedDateEl = document.getElementById('displaySelectedDate');
-        const dateErrorEl = document.getElementById('dateError');
         const timeSlotsEl = document.getElementById('timeSlots');
         const selectedTimeInput = document.getElementById('selectedTime');
+        const appointmentForm = document.getElementById('appointmentForm');
+        const dateErrorEl = document.getElementById('dateError');
         const timeErrorEl = document.getElementById('timeError');
         const formMessageEl = document.getElementById('formMessage');
 
         let currentMonth = new Date().getMonth();
         let currentYear = new Date().getFullYear();
-        let today = new Date();
-        today.setHours(0, 0, 0, 0); // Reset time for accurate date comparison
+        let availableTimeSlots = []; // This will be fetched from the backend
 
-        const monthNames = [
-            "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-            "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
-        ];
-
-        // URL de tu backend en Render
-        const BACKEND_URL = 'https://cata-backend-5z45.onrender.com'; //
-
-        // Variable para almacenar los turnos ocupados reales del backend
-        let allBookedSlots = {}; // Almacenará { 'YYYY-MM-DD': ['HH:MM', 'HH:MM'], ... }
-
-        // Función para cargar los turnos desde el backend
-        async function fetchBookedSlots() {
+        // Function to fetch occupied dates and times from backend
+        async function fetchOccupiedSlots() {
             try {
-                const response = await fetch(`${BACKEND_URL}/api/appointments`);
+                // Ensure this URL is correct for your Render backend
+                const response = await fetch('https://nailscata-back-production.up.railway.app/appointments');
                 if (!response.ok) {
-                    throw new Error('Error al cargar los turnos desde el backend');
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                const data = await response.json();
-                
-                // Procesar los datos para que coincidan con el formato esperado
-                allBookedSlots = {};
-                data.reservedSlots.forEach(slot => { //
-                    const fecha = slot.fecha;
-                    const hora = slot.hora;
-                    if (!allBookedSlots[fecha]) {
-                        allBookedSlots[fecha] = [];
+                const occupiedAppointments = await response.json();
+                console.log("Citas ocupadas:", occupiedAppointments);
+
+                // Transform occupiedAppointments into a more usable format for the calendar
+                const occupiedSlotsMap = {};
+                occupiedAppointments.forEach(app => {
+                    const date = new Date(app.date).toISOString().split('T')[0]; // YYYY-MM-DD
+                    const time = app.time;
+                    if (!occupiedSlotsMap[date]) {
+                        occupiedSlotsMap[date] = new Set();
                     }
-                    allBookedSlots[fecha].push(hora);
+                    occupiedSlotsMap[date].add(time);
                 });
-                console.log('Turnos cargados:', allBookedSlots);
+                return occupiedSlotsMap;
             } catch (error) {
-                console.error('Error fetching booked slots:', error);
-                formMessageEl.classList.remove('hidden', 'bg-green-100', 'text-green-700', 'bg-blue-100', 'text-blue-700');
-                formMessageEl.classList.add('bg-red-100', 'text-red-700');
-                formMessageEl.textContent = 'Error al cargar turnos disponibles. Intenta recargar la página.';
+                console.error("Error fetching occupied slots:", error);
+                return {}; // Return empty object on error
             }
         }
 
-        function renderCalendar() {
-            calendarEl.innerHTML = ''; // Clear previous days
-            timeSlotsEl.innerHTML = ''; // Clear time slots when month changes
-            selectedDateInput.value = '';
-            selectedTimeInput.value = '';
-            displaySelectedDateEl.textContent = 'la fecha seleccionada';
+        async function renderCalendar() {
+            calendarEl.innerHTML = '';
+            timeSlotsEl.innerHTML = ''; // Clear time slots when rendering a new month
+            selectedDateInput.value = ''; // Clear selected date input
+            selectedTimeInput.value = ''; // Clear selected time input
+            displaySelectedDateEl.textContent = 'la fecha seleccionada'; // Reset display text
             dateErrorEl.classList.add('hidden');
             timeErrorEl.classList.add('hidden');
+            formMessageEl.classList.add('hidden');
 
             const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
-            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-            const firstDayOfWeek = (firstDayOfMonth.getDay() + 6) % 7; // Adjust to start on Monday (0-6 where 0 is Monday)
+            const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Normalize today to start of day
 
-            currentMonthYearEl.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+            currentMonthYearEl.textContent = firstDayOfMonth.toLocaleDateString('es-ES', {
+                month: 'long',
+                year: 'numeric'
+            });
 
-            // Add empty divs for preceding days of the week
-            for (let i = 0; i < firstDayOfWeek; i++) {
-                calendarEl.innerHTML += `<div class="calendar-day"></div>`;
+            const occupiedSlotsMap = await fetchOccupiedSlots();
+
+            // Fill leading empty days
+            const startDay = (firstDayOfMonth.getDay() + 6) % 7; // Adjust to start on Monday (0=Mon, 6=Sun)
+            for (let i = 0; i < startDay; i++) {
+                const dayEl = document.createElement('div');
+                dayEl.classList.add('calendar-day');
+                calendarEl.appendChild(dayEl);
             }
 
-            // Add days of the month
-            for (let day = 1; day <= daysInMonth; day++) {
+            // Fill days of the month
+            for (let day = 1; day <= lastDayOfMonth.getDate(); day++) {
                 const date = new Date(currentYear, currentMonth, day);
-                date.setHours(0, 0, 0, 0); // Reset time for accurate comparison
+                const dateString = date.toISOString().split('T')[0]; // YYYY-MM-DD
+                const dayEl = document.createElement('div');
+                dayEl.textContent = day;
+                dayEl.classList.add('calendar-day');
 
-                let dayClass = 'calendar-day';
-                let dataDate = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                
                 if (date < today) {
-                    dayClass += ' past-date';
+                    dayEl.classList.add('past-date');
+                } else {
+                    dayEl.classList.add('current-month');
+                    dayEl.dataset.date = dateString;
+                    dayEl.addEventListener('click', async () => {
+                        // Clear previous selection
+                        document.querySelectorAll('.calendar-day.selected').forEach(el => {
+                            el.classList.remove('selected');
+                        });
+                        dayEl.classList.add('selected');
+                        selectedDateInput.value = dateString;
+                        displaySelectedDateEl.textContent = date.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+                        timeErrorEl.classList.add('hidden'); // Hide time error on new date selection
+                        
+                        // Fetch and display time slots for the selected date
+                        await fetchTimeSlots(dateString, occupiedSlotsMap[dateString] || new Set());
+                    });
                 }
-                // Marcar días del 1 al 13 del mes actual como no disponibles
-                else if (date.getFullYear() === today.getFullYear() &&
-                         date.getMonth() === today.getMonth() &&
-                         day >= 1 && day <= 13) {
-                    dayClass += ' past-date'; 
-                }
-                else {
-                    dayClass += ' current-month';
-                }
-
-                if (selectedDateInput.value === dataDate) {
-                    dayClass += ' selected';
-                }
-
-                calendarEl.innerHTML += `
-                    <div class="${dayClass}" data-date="${dataDate}">
-                        ${day}
-                    </div>
-                `;
+                calendarEl.appendChild(dayEl);
             }
-
-            addCalendarEventListeners();
         }
 
-        function addCalendarEventListeners() {
-            document.querySelectorAll('.calendar-day:not(.past-date)').forEach(dayEl => {
-                dayEl.addEventListener('click', () => {
-                    // Remove 'selected' class from previously selected day
-                    document.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('selected'));
-                    
-                    // Add 'selected' class to clicked day
-                    dayEl.classList.add('selected');
-                    
-                    const selectedDate = dayEl.dataset.date;
-                    selectedDateInput.value = selectedDate;
-                    displaySelectedDateEl.textContent = formatDisplayDate(selectedDate);
-                    dateErrorEl.classList.add('hidden'); // Hide error if a date is selected
-
-                    renderTimeSlots(selectedDate);
-                });
-            });
-        }
-
-        function formatDisplayDate(dateString) {
-            const [year, month, day] = dateString.split('-');
-            const date = new Date(year, parseInt(month) - 1, day);
-            return date.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
-        }
-
-        function addTimeSlotEventListeners() {
-            document.querySelectorAll('.time-slot:not(.booked)').forEach(slotEl => {
-                slotEl.addEventListener('click', () => {
-                    document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected-time'));
-                    slotEl.classList.add('selected-time');
-                    selectedTimeInput.value = slotEl.dataset.time;
-                    timeErrorEl.classList.add('hidden');
-                });
-            });
-        }
-
-        function renderTimeSlots(dateString) {
+        async function fetchTimeSlots(dateString, occupiedTimesForDate) {
+            // Define your base available time slots
+            const baseSlots = ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30"];
+            
             timeSlotsEl.innerHTML = ''; // Clear previous time slots
-            selectedTimeInput.value = ''; // Reset selected time
-            timeErrorEl.classList.add('hidden'); // Hide time error
 
-            const selectedDateObj = new Date(dateString);
-            selectedDateObj.setHours(0, 0, 0, 0); // Normalize to start of day
-            const dayOfMonth = selectedDateObj.getDate();
-            const selectedMonth = selectedDateObj.getMonth();
-            const selectedYear = selectedDateObj.getFullYear();
-
-            let timesToDisplay = [];
-            // Horarios fijos para la semana del 14 al 19
-            const fixedHours14to19 = ['09:00', '10:00', '11:00', '14:00', '15:00', '16:00'];
-
-            // Verificar si la fecha seleccionada es en el mes y año actual
-            const isCurrentActualMonth = (selectedYear === today.getFullYear() && selectedMonth === today.getMonth());
-
-            // Si es el mes actual Y entre el 14 y el 19, mostrar horarios fijos
-            if (isCurrentActualMonth && dayOfMonth >= 14 && dayOfMonth <= 19) {
-                timesToDisplay = fixedHours14to19;
-            } else {
-                // Para todos los demás casos, no hay slots automáticos.
-                timesToDisplay = []; 
+            if (baseSlots.length === 0) {
+                timeSlotsEl.innerHTML = '<p class="text-gray-500">No hay horarios disponibles para este día.</p>';
+                return;
             }
 
-            // Obtener los slots ya reservados para la fecha actual desde allBookedSlots
-            const slotsForDate = allBookedSlots[dateString] || [];
-            const now = new Date(); // Hora actual
+            const now = new Date();
+            const selectedDate = new Date(dateString);
+            
+            baseSlots.forEach(slot => {
+                const timeSlotEl = document.createElement('div');
+                timeSlotEl.classList.add('time-slot');
+                timeSlotEl.textContent = slot;
+                timeSlotEl.dataset.time = slot;
 
-            if (timesToDisplay.length > 0) {
-                timesToDisplay.forEach(time => {
-                    let timeClass = 'time-slot';
-                    let isBooked = slotsForDate.includes(time); // Comprueba contra los turnos del backend
-                    let isPastTime = false;
+                const [hours, minutes] = slot.split(':').map(Number);
+                const slotDateTime = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate(), hours, minutes);
 
-                    // Solo verificar si la hora ya pasó si la fecha seleccionada es exactamente hoy
-                    if (selectedDateObj.getTime() === today.getTime()) {
-                        const [hour, minute] = time.split(':').map(Number);
-                        const slotDateTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hour, minute);
-                        if (slotDateTime <= now) {
-                            isPastTime = true;
-                        }
-                    }
-
-                    if (isBooked || isPastTime) {
-                        timeClass += ' booked';
-                    }
-
-                    timeSlotsEl.innerHTML += `
-                        <div class="${timeClass}" data-time="${time}" ${isBooked || isPastTime ? 'disabled' : ''}>
-                            ${time}
-                        </div>
-                    `;
-                });
-            } else {
-                timeSlotsEl.innerHTML = '<p class="text-gray-600 text-center col-span-full">No hay horarios disponibles para selección automática en esta fecha. Por favor, contacta directamente para más información.</p>';
-            }
-
-            addTimeSlotEventListeners();
+                // Check if the slot is in the past or already booked
+                if (slotDateTime < now || occupiedTimesForDate.has(slot)) {
+                    timeSlotEl.classList.add('booked');
+                } else {
+                    timeSlotEl.addEventListener('click', () => {
+                        document.querySelectorAll('.time-slot.selected-time').forEach(el => {
+                            el.classList.remove('selected-time');
+                        });
+                        timeSlotEl.classList.add('selected-time');
+                        selectedTimeInput.value = slot;
+                        timeErrorEl.classList.add('hidden'); // Hide time error on new time selection
+                    });
+                }
+                timeSlotsEl.appendChild(timeSlotEl);
+            });
         }
 
         prevMonthBtn.addEventListener('click', () => {
@@ -751,82 +704,77 @@
             renderCalendar();
         });
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            await fetchBookedSlots(); // Cargar los turnos al inicio
-            renderCalendar();
-            renderTimeSlots(selectedDateInput.value); 
-        });
+        renderCalendar(); // Initial render
 
-        // Form Submission Logic
-        document.getElementById('appointmentForm').addEventListener('submit', async function(event) { //
+        // Form submission logic
+        appointmentForm.addEventListener('submit', async function (event) {
             event.preventDefault(); // Prevent default form submission
 
             let isValid = true;
-
             // Validate Name
-            const nameInput = document.getElementById('name'); //
+            const nameInput = document.getElementById('name');
             if (nameInput.value.trim() === '') {
-                nameInput.classList.add('border-red-500'); //
-                isValid = false; //
+                nameInput.classList.add('border-red-500');
+                isValid = false;
             } else {
-                nameInput.classList.remove('border-red-500'); //
+                nameInput.classList.remove('border-red-500');
             }
 
             // Validate Email
-            const emailInput = document.getElementById('email'); //
+            const emailInput = document.getElementById('email');
             if (emailInput.value.trim() === '' || !emailInput.value.includes('@')) {
-                emailInput.classList.add('border-red-500'); //
-                isValid = false; //
+                emailInput.classList.add('border-red-500');
+                isValid = false;
             } else {
-                emailInput.classList.remove('border-red-500'); //
+                emailInput.classList.remove('border-red-500');
             }
 
             // Validate Service
-            const serviceInput = document.getElementById('service'); //
+            const serviceInput = document.getElementById('service');
             if (serviceInput.value === '') {
-                serviceInput.classList.add('border-red-500'); //
-                isValid = false; //
+                serviceInput.classList.add('border-red-500');
+                isValid = false;
             } else {
-                serviceInput.classList.remove('border-red-500'); //
+                serviceInput.classList.remove('border-red-500');
             }
 
             // Validate Date
-            if (selectedDateInput.value === '') { //
-                dateErrorEl.classList.remove('hidden'); //
-                isValid = false; //
+            if (selectedDateInput.value === '') {
+                dateErrorEl.classList.remove('hidden');
+                isValid = false;
             } else {
-                dateErrorEl.classList.add('hidden'); //
+                dateErrorEl.classList.add('hidden');
             }
 
             // Validate Time
-            if (selectedTimeInput.value === '') { //
-                timeErrorEl.classList.remove('hidden'); //
-                isValid = false; //
+            if (selectedTimeInput.value === '') {
+                timeErrorEl.classList.remove('hidden');
+                isValid = false;
             } else {
-                timeErrorEl.classList.add('hidden'); //
+                timeErrorEl.classList.add('hidden');
             }
 
             if (isValid) {
-                const appointmentData = {
-                    nombre: nameInput.value.trim(),
+                formMessageEl.classList.remove('hidden', 'bg-red-100', 'text-red-700');
+                formMessageEl.classList.add('bg-blue-100', 'text-blue-700'); // Indicate processing
+                formMessageEl.textContent = 'Agendando cita...';
+
+                const formData = {
+                    name: nameInput.value.trim(),
                     email: emailInput.value.trim(),
-                    servicio: serviceInput.value,
-                    fecha: selectedDateInput.value,
-                    hora: selectedTimeInput.value,
-                    message: document.getElementById('message').value.trim() // Asumiendo que existe el input 'message'
+                    service: serviceInput.value,
+                    date: selectedDateInput.value,
+                    time: selectedTimeInput.value,
+                    message: document.getElementById('message').value.trim()
                 };
 
-                formMessageEl.classList.remove('hidden', 'bg-green-100', 'bg-red-100', 'text-green-700', 'text-red-700');
-                formMessageEl.classList.add('bg-blue-100', 'text-blue-700');
-                formMessageEl.textContent = 'Enviando tu cita...';
-
                 try {
-                    const response = await fetch(`${BACKEND_URL}/api/appointments`, { //
+                    const response = await fetch('https://nailscata-back-production.up.railway.app/appointments', {
                         method: 'POST',
                         headers: {
-                            'Content-Type': 'application/json'
+                            'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify(appointmentData)
+                        body: JSON.stringify(formData),
                     });
 
                     const result = await response.json();
@@ -834,17 +782,15 @@
                     if (response.ok) {
                         formMessageEl.classList.remove('bg-blue-100', 'text-blue-700', 'bg-red-100', 'text-red-700');
                         formMessageEl.classList.add('bg-green-100', 'text-green-700');
-                        formMessageEl.textContent = result.message || '¡Cita agendada con éxito! Nos pondremos en contacto pronto.';
+                        formMessageEl.textContent = '¡Cita agendada con éxito! Nos pondremos en contacto pronto.';
                         
-                        // Opcional: resetear el formulario después de éxito
-                        this.reset(); //
-                        selectedDateInput.value = ''; //
-                        selectedTimeInput.value = ''; //
-                        timeSlotsEl.innerHTML = ''; // Limpiar horarios
-                        await fetchBookedSlots(); // Recargar turnos después de agendar uno nuevo
-                        renderCalendar(); // Re-renderizar calendario para limpiar selección y mostrar nuevos ocupados
+                        this.reset();
+                        selectedDateInput.value = '';
+                        selectedTimeInput.value = '';
+                        // Re-render calendar to clear selection and show newly occupied slots
+                        renderCalendar(); 
                     } else {
-                        // Error del servidor
+                        // Server error
                         formMessageEl.classList.remove('bg-blue-100', 'text-blue-700', 'bg-green-100', 'text-green-700');
                         formMessageEl.classList.add('bg-red-100', 'text-red-700');
                         formMessageEl.textContent = result.error || 'Error al agendar la cita. Por favor, intenta de nuevo.';
