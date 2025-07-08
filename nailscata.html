@@ -737,16 +737,16 @@
             formMessageEl.textContent = '';
 
             // Basic validation
-            const name = document.getElementById('name').value.trim();
+            const nombre = document.getElementById('name').value.trim();
             const telefono = document.getElementById('telefono').value.trim();
-            const service = document.getElementById('service').value;
-            const selectedDate = selectedDateInput.value;
-            const selectedTime = selectedTimeInput.value;
+            const servicio = document.getElementById('service').value;
+            const fecha = selectedDateInput.value;
+            const hora = selectedTimeInput.value;
             const message = document.getElementById('message').value.trim();
 
             let isValid = true;
 
-            if (!name || !telefono || !service || !selectedDate || !selectedTime) {
+            if (!nombre || !telefono || !servicio || !fecha || !hora) {
                 formMessageEl.classList.remove('hidden');
                 formMessageEl.classList.remove('bg-green-100', 'text-green-700', 'bg-blue-100', 'text-blue-700');
                 formMessageEl.classList.add('bg-red-100', 'text-red-700');
@@ -773,12 +773,12 @@
             }
 
             const appointmentData = {
-                name,
-                telefono,
-                service,
-                date: selectedDate,
-                time: selectedTime,
-                message
+                nombre: nombre,      // Antes era name: nombre
+                telefono: telefono,
+                servicio: servicio,
+                fecha: fecha,        // Antes era date: fecha
+                hora: hora,          // Antes era time: hora
+                message: message
             };
             console.log("DEBUG: Datos de la cita a enviar:", appointmentData);
 
