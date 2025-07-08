@@ -573,6 +573,7 @@
         async function fetchAvailableTimes(date) {
             timeSlotsContainer.innerHTML = '<p class="text-gray-500 text-center col-span-full">Cargando horarios...</p>';
             selectedTimeInput.value = ''; // Clear selected time when date changes
+            console.log("DEBUG: La fecha que se va a enviar a la API es:", date); 
 
             try {
                 const response = await fetch(`${API_BASE_URL}/available-times/${date}`);
