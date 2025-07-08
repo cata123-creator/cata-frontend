@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NailsCata - Gestión de Horarios por Fecha</title>
+    <title>NailsCata - Gestión de Turnos</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -24,56 +24,10 @@
             text-align: center;
             margin-bottom: 30px;
         }
-        .message {
-            padding: 10px;
-            margin-bottom: 15px;
-            border-radius: 8px;
-            font-weight: 500;
-        }
-        .message.success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        .message.error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            color: #4a5568;
-            font-weight: 600;
-        }
-        .form-group input[type="date"],
-        .form-group input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #fed7e2; /* Light pink border */
-            border-radius: 5px;
-            box-sizing: border-box;
-        }
-        .btn-primary {
-            background-color: #e91e63; /* Medium pink */
-            color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        .btn-primary:hover {
-            background-color: #c2185b; /* Darker pink on hover */
-        }
         .table-container {
             overflow-x: auto;
             border: 1px solid #fbcfe8; /* Light pink border */
             border-radius: 8px;
-            margin-top: 25px;
         }
         table {
             width: 100%;
@@ -93,30 +47,31 @@
         tr:hover {
             background-color: #fce4ec; /* Hover effect */
         }
-        .action-btns button {
-            margin-right: 5px;
-            padding: 5px 10px;
-            font-size: 0.8rem;
-        }
-        .edit-btn {
-            background-color: #4CAF50; /* Green */
+        .btn-primary {
+            background-color: #e91e63; /* Medium pink */
             color: white;
+            padding: 8px 15px;
             border-radius: 5px;
-            border: none;
-            cursor: pointer;
+            transition: background-color 0.3s ease;
         }
-        .edit-btn:hover {
-            background-color: #45a049;
+        .btn-primary:hover {
+            background-color: #c2185b; /* Darker pink on hover */
         }
-        .delete-btn {
-            background-color: #f44336; /* Red */
-            color: white;
-            border-radius: 5px;
-            border: none;
-            cursor: pointer;
+        .message {
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            font-weight: 500;
         }
-        .delete-btn:hover {
-            background-color: #da190b;
+        .message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
         }
         .hidden {
             display: none;
@@ -134,204 +89,200 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        /* FIX PARA EL PROBLEMA DE VISUALIZACIÓN DE LAS FILAS DE LA TABLA */
+        tr {
+            display: table-row !important; /* Asegura que las filas se comporten como filas de tabla */
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1 class="text-3xl font-bold">Gestión de Horarios por Fecha</h1>
-        <div id="message" class="message hidden"></div>
+        <h1 class="text-3xl font-bold">Gestión de Horarios Disponibles</h1>
+        <div id="messageArea" class="message hidden"></div>
+        <div class="loading-spinner hidden" id="loading"></div>
 
-        <form id="scheduleForm" class="bg-gray-50 p-6 rounded-lg shadow-inner">
-            <div class="form-group">
-                <label for="scheduleDate">Fecha:</label>
-                <input type="date" id="scheduleDate" class="p-2 border rounded" required>
+        <form id="scheduleForm" class="mb-6 p-6 bg-pink-50 rounded-lg shadow-inner">
+            <h2 class="text-xl font-semibold text-pink-700 mb-4">Configurar Horario</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="dateInput" class="block text-pink-700 text-sm font-bold mb-2">Fecha:</label>
+                    <input type="date" id="dateInput" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                </div>
+                <div>
+                    <label for="timesInput" class="block text-pink-700 text-sm font-bold mb-2">Horarios Disponibles (separados por coma, ej: 09:00,10:30,14:00):</label>
+                    <input type="text" id="timesInput" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="ej: 09:00,10:30,14:00" required>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="availableTimes">Horarios Disponibles (separados por coma, ej: 10:00,14:30):</label>
-                <input type="text" id="availableTimes" class="p-2 border rounded" placeholder="HH:MM,HH:MM">
-            </div>
-            <button type="submit" class="btn-primary">Guardar Horario</button>
+            <button type="submit" class="mt-6 bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                Guardar Horario
+            </button>
+            <button type="button" id="clearFormBtn" class="mt-6 ml-2 bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                Limpiar Formulario
+            </button>
         </form>
 
-        <div class="table-container mt-8">
-            <table class="min-w-full bg-white border border-gray-200 shadow-sm rounded-lg overflow-hidden">
+        <h2 class="text-xl font-semibold text-pink-700 mb-4">Horarios Configurados</h2>
+        <div class="table-container">
+            <table class="min-w-full bg-white border border-pink-200">
                 <thead>
-                    <tr class="bg-purple-100 text-purple-700 uppercase text-sm leading-normal">
-                        <th class="py-3 px-6 text-left">Fecha</th>
-                        <th class="py-3 px-6 text-left">Horarios</th>
-                        <th class="py-3 px-6 text-center">Acciones</th>
+                    <tr>
+                        <th class="py-2 px-4 border-b border-pink-200">Fecha</th>
+                        <th class="py-2 px-4 border-b border-pink-200">Horarios</th>
+                        <th class="py-2 px-4 border-b border-pink-200">Acciones</th>
                     </tr>
                 </thead>
-                <tbody id="schedulesTableBody" class="text-gray-600 text-sm font-light">
+                <tbody id="schedulesTableBody">
                     </tbody>
             </table>
-            <div id="loadingSpinner" class="loading-spinner hidden"></div>
+            <p id="noSchedulesMessage" class="hidden text-center text-gray-500 mt-4">No hay horarios configurados.</p>
         </div>
     </div>
 
     <script>
-        const API_URL = 'https://cata-backend-5z45.onrender.com/api/schedules';
-        const schedulesTableBody = document.getElementById('schedulesTableBody');
-        const messageEl = document.getElementById('message');
-        const loadingSpinner = document.getElementById('loadingSpinner');
-        const scheduleDateInput = document.getElementById('scheduleDate');
-        const availableTimesInput = document.getElementById('availableTimes');
+        const API_BASE_URL = 'https://cata-backend-5z45.onrender.com';
         const scheduleForm = document.getElementById('scheduleForm');
+        const dateInput = document.getElementById('dateInput');
+        const timesInput = document.getElementById('timesInput');
+        const schedulesTableBody = document.getElementById('schedulesTableBody');
+        const messageArea = document.getElementById('messageArea');
+        const loadingSpinner = document.getElementById('loading');
+        const noSchedulesMessage = document.getElementById('noSchedulesMessage');
+        const clearFormBtn = document.getElementById('clearFormBtn');
 
-        function showMessage(msg, type) {
-            messageEl.classList.remove('hidden', 'success', 'error');
-            messageEl.classList.add(type);
-            messageEl.textContent = msg;
+        let editingDate = null; // Para saber si estamos editando o creando
+
+        function showMessage(message, type) {
+            messageArea.textContent = message;
+            messageArea.className = `message ${type}`;
+            messageArea.classList.remove('hidden');
             setTimeout(() => {
-                messageEl.classList.add('hidden');
+                messageArea.classList.add('hidden');
             }, 3000);
         }
 
-        async function fetchSchedules() {
+        function showLoading() {
             loadingSpinner.classList.remove('hidden');
+        }
+
+        function hideLoading() {
+            loadingSpinner.classList.add('hidden');
+        }
+
+        async function fetchSchedules() {
+            showLoading();
             try {
-                const response = await fetch(API_URL);
+                const response = await fetch(`${API_BASE_URL}/api/schedules`);
                 if (!response.ok) {
                     const errorData = await response.json();
                     throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
                 }
-                const schedules = await response.json(); // Esta es la línea 135
+                const data = await response.json(); // data ya es el array de horarios
 
-                // AÑADE ESTA LÍNEA NUEVA PARA DEPURACIÓN:
-                console.log('[DEBUG] Valor de "schedules" después de response.json():', schedules);
-
-                renderSchedules(schedules);
+                schedulesTableBody.innerHTML = '';
+                if (data.length === 0) { // CORREGIDO
+                    noSchedulesMessage.classList.remove('hidden');
+                } else {
+                    noSchedulesMessage.classList.add('hidden');
+                    data.forEach(schedule => { // CORREGIDO
+                        const row = `
+                            <tr class="hover:bg-pink-50">
+                                <td class="py-2 px-4 border-b border-pink-200">${schedule.date}</td>
+                                <td class="py-2 px-4 border-b border-pink-200">${schedule.available_times ? schedule.available_times.join(', ') : ''}</td>
+                                <td class="py-2 px-4 border-b border-pink-200">
+                                    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-sm edit-btn" data-date="${schedule.date}" data-times="${schedule.available_times ? schedule.available_times.join(',') : ''}">
+                                        Editar
+                                    </button>
+                                    <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm delete-btn" data-date="${schedule.date}">
+                                        Eliminar
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                        schedulesTableBody.insertAdjacentHTML('beforeend', row);
+                    });
+                }
             } catch (error) {
-                console.error('Error al obtener horarios por fecha:', error);
-                showMessage(`Error al obtener horarios: ${error.message}.`, 'error');
+                console.error('Error al obtener horarios:', error);
+                showMessage(`Error al cargar horarios: ${error.message}.`, 'error');
             } finally {
-                loadingSpinner.classList.add('hidden');
+                hideLoading();
             }
         }
 
-        function renderSchedules(schedules) {
-            console.log('[DEBUG] Iniciando renderSchedules. Horarios recibidos:', schedules);
-            schedulesTableBody.innerHTML = ''; // Limpiar filas existentes
+        scheduleForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            showLoading();
 
-            if (schedules.length === 0) {
-                schedulesTableBody.innerHTML = '<tr><td colspan="3" class="py-3 px-6 text-center">No hay horarios configurados.</td></tr>';
-                return;
-            }
+            const date = dateInput.value;
+            const times = timesInput.value.split(',').map(time => time.trim()).filter(time => time !== '');
 
-            schedules.forEach(schedule => {
-                const row = document.createElement('tr');
-                row.classList.add('border-b', 'border-gray-200', 'hover:bg-gray-100');
-                const formattedDate = new Date(schedule.date).toLocaleDateString('es-AR', {
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit'
-                });
-                const timesString = Array.isArray(schedule.available_times) ? schedule.available_times.join(', ') : '';
-
-                row.innerHTML = `
-                    <td class="py-3 px-6 text-left whitespace-nowrap">${formattedDate}</td>
-                    <td class="py-3 px-6 text-left">${timesString}</td>
-                    <td class="py-3 px-6 text-center action-btns">
-                        <button class="edit-btn" data-date="${formattedDate}" data-times="${timesString}">Editar</button>
-                        <button class="delete-btn" data-date="${formattedDate}">Eliminar</button>
-                    </td>
-                `;
-                schedulesTableBody.appendChild(row);
-            });
-        }
-
-        async function saveSchedule(date, availableTimes) {
-            loadingSpinner.classList.remove('hidden');
             try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
+                const method = editingDate ? 'PUT' : 'POST';
+                const url = editingDate ? `${API_BASE_URL}/api/schedules/${editingDate}` : `${API_BASE_URL}/api/schedules`;
+
+                const response = await fetch(url, {
+                    method: 'POST', // Siempre es POST en esta implementación (INSERT ... ON CONFLICT)
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ date, available_times: availableTimes })
+                    body: JSON.stringify({ date, available_times: times })
                 });
 
-                const result = await response.json();
-
                 if (!response.ok) {
-                    throw new Error(result.error || `HTTP error! status: ${response.status}`);
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
                 }
 
                 showMessage('Horario guardado con éxito.', 'success');
-                scheduleForm.reset(); // Limpiar el formulario
-                fetchSchedules(); // Volver a cargar para actualizar la tabla
-
+                scheduleForm.reset();
+                editingDate = null; // Resetear el modo edición
+                fetchSchedules();
             } catch (error) {
                 console.error('Error al guardar horario:', error);
                 showMessage(`Error al guardar horario: ${error.message}.`, 'error');
             } finally {
-                loadingSpinner.classList.add('hidden');
+                hideLoading();
             }
-        }
-
-        async function deleteSchedule(date) {
-            if (!confirm('¿Estás seguro de que quieres eliminar este horario?')) {
-                return;
-            }
-
-            loadingSpinner.classList.remove('hidden');
-            try {
-                const response = await fetch(`${API_URL}/${date}`, {
-                    method: 'DELETE'
-                });
-
-                const result = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(result.error || `HTTP error! status: ${response.status}`);
-                }
-
-                showMessage('Horario eliminado con éxito.', 'success');
-                fetchSchedules(); // Volver a cargar para actualizar la tabla
-
-            } catch (error) {
-                console.error('Error al eliminar horario:', error);
-                showMessage(`Error al eliminar horario: ${error.message}.`, 'error');
-            } finally {
-                loadingSpinner.classList.add('hidden');
-            }
-        }
-
-        scheduleForm.addEventListener('submit', (event) => {
-            event.preventDefault();
-            const date = scheduleDateInput.value;
-            const timesString = availableTimesInput.value.trim();
-            
-            let availableTimes = [];
-            if (timesString) {
-                availableTimes = timesString.split(',').map(time => time.trim()).filter(time => time !== '');
-            }
-
-            if (!date) {
-                showMessage('Por favor, selecciona una fecha.', 'error');
-                return;
-            }
-            if (!availableTimes.length && timesString !== '') {
-                 showMessage('Por favor, ingresa los horarios en el formato correcto (HH:MM,HH:MM).', 'error');
-                 return;
-            }
-
-            saveSchedule(date, availableTimes);
         });
 
-        schedulesTableBody.addEventListener('click', (event) => {
+        // Delegación de eventos para los botones de editar y eliminar
+        schedulesTableBody.addEventListener('click', async (event) => {
             if (event.target.classList.contains('edit-btn')) {
                 const dateToEdit = event.target.dataset.date;
                 const timesToEdit = event.target.dataset.times;
-
-                scheduleDateInput.value = dateToEdit;
-                availableTimesInput.value = timesToEdit;
-                showMessage(`Editando horario para la fecha ${dateToEdit}. Modifica y guarda.`, 'success');
-
+                dateInput.value = dateToEdit;
+                timesInput.value = timesToEdit;
+                editingDate = dateToEdit; // Establecer el modo edición
             } else if (event.target.classList.contains('delete-btn')) {
                 const dateToDelete = event.target.dataset.date;
-                deleteSchedule(dateToDelete);
+                if (confirm(`¿Estás seguro de que quieres eliminar el horario para la fecha ${dateToDelete}?`)) {
+                    showLoading();
+                    try {
+                        const response = await fetch(`${API_BASE_URL}/api/schedules/${dateToDelete}`, {
+                            method: 'DELETE'
+                        });
+
+                        if (!response.ok) {
+                            const errorData = await response.json();
+                            throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+                        }
+
+                        showMessage('Horario eliminado con éxito.', 'success');
+                        fetchSchedules();
+                    } catch (error) {
+                        console.error('Error al eliminar horario:', error);
+                        showMessage(`Error al eliminar horario: ${error.message}.`, 'error');
+                    } finally {
+                        hideLoading();
+                    }
+                }
             }
+        });
+
+        clearFormBtn.addEventListener('click', () => {
+            scheduleForm.reset();
+            editingDate = null;
         });
 
         // Cargar horarios al cargar la página
