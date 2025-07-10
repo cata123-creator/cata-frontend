@@ -506,12 +506,11 @@
 
     // Smooth scroll for navigation links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
+        anchor.addEventListener('click', function(e) {
             e.preventDefault();
             document.querySelector(this.getAttribute('href')).scrollIntoView({
                 behavior: 'smooth'
             });
-            // Hide mobile menu after clicking a link
             if (!menu.classList.contains('hidden')) {
                 menu.classList.add('hidden');
             }
@@ -540,7 +539,7 @@
 
     async function fetchAvailableTimes(date) {
         timeSlotsContainer.innerHTML = '<p class="text-gray-500 text-center col-span-full">Cargando horarios...</p>';
-        selectedTimeInput.value = ''; // Clear selected time when date changes
+        selectedTimeInput.value = '';
         console.log("DEBUG: La fecha que se va a enviar a la API es:", date);
 
         try {
@@ -564,10 +563,6 @@
             }
 
             timeSlotsContainer.innerHTML = '';
-            
-            // Ahora, en lugar de fetchBookedTimes, usaremos la lógica de tu backend que ya devuelve los horarios disponibles filtrados.
-            // Si el backend es como en el server.js que me pasaste, no necesitas el fetchBookedTimes.
-            // Por lo tanto, el código es más simple y solo renderiza los horarios disponibles.
 
             availableTimes.forEach(time => {
                 const timeSlotBtn = document.createElement('button');
@@ -575,7 +570,7 @@
                 timeSlotBtn.classList.add('time-slot', 'p-3', 'rounded-lg', 'border', 'border-pink-300', 'hover:bg-pink-100', 'transition', 'duration-200', 'ease-in-out', 'text-pink-600', 'font-medium');
                 timeSlotBtn.textContent = time;
                 timeSlotBtn.dataset.time = time;
-                
+
                 timeSlotBtn.addEventListener('click', () => {
                     document.querySelectorAll('.time-slot').forEach(btn => {
                         btn.classList.remove('selected-time');
@@ -686,32 +681,31 @@
 
     document.addEventListener('DOMContentLoaded', renderCalendar);
 
-
     // Form Submission Logic
     const appointmentForm = document.getElementById('appointmentForm');
     const formMessageEl = document.getElementById('formMessage');
 
-    appointmentForm.addEventListener('submit', async (e) => {
+    appointmentForm.addEventListener('submit', async(e) => {
         e.preventDefault();
 
         formMessageEl.classList.add('hidden');
         formMessageEl.textContent = '';
 
-        // CORREGIDO: Usamos los IDs correctos para los campos y nos aseguramos de que las variables coincidan con el backend.
+        // CORREGIDO: Usamos los IDs que sí existen en tu HTML
         const name = document.getElementById('name').value.trim();
-        const email = document.getElementById('email').value.trim(); // Se añade el campo de email
-        const phone = document.getElementById('phone').value.trim(); // Se cambia telefono a phone
-        const service = document.getElementById('service').value;
-        const date = selectedDateInput.value;
-        const time = selectedTimeInput.value;
+        const telefono = document.getElementById('telefono').value.trim();
+        const servicio = document.getElementById('service').value;
+        const fecha = selectedDateInput.value;
+        const hora = selectedTimeInput.value;
 
-        // Se elimina el campo de mensaje ya que no es obligatorio en el backend.
+        // Se usa un valor por defecto para 'email' ya que el campo no existe en el HTML
+        const email = "no-email@provided.com";
 
         let isValid = true;
-        if (!name || !email || !phone || !service || !date || !time) {
+        if (!name || !telefono || !servicio || !fecha || !hora) {
             formMessageEl.classList.remove('hidden', 'bg-green-100', 'text-green-700', 'bg-blue-100', 'text-blue-700');
             formMessageEl.classList.add('bg-red-100', 'text-red-700');
-            formMessageEl.textContent = 'Por favor, completa todos los campos obligatorios (Nombre, Email, Teléfono, Servicio, Fecha y Horario).';
+            formMessageEl.textContent = 'Por favor, completa todos los campos obligatorios (Nombre, Teléfono, Servicio, Fecha y Horario).';
             isValid = false;
         }
 
@@ -719,13 +713,14 @@
             return;
         }
 
+        // CORREGIDO: Los nombres de las propiedades coinciden con el backend
         const appointmentData = {
             name: name,
             email: email,
-            phone: phone,
-            service: service,
-            date: date,
-            time: time,
+            phone: telefono, // El backend espera 'phone', usamos el valor de 'telefono'
+            service: servicio,
+            date: fecha,
+            time: hora,
         };
         console.log("DEBUG: Datos de la cita a enviar:", appointmentData);
 
