@@ -533,8 +533,10 @@
 
         let currentMonth = new Date().getMonth();
         let currentYear = new Date().getFullYear();
-
-        const API_BASE_URL = 'http://localhost:3000/api'; // Ensure this URL is correct for your backend
+        const isLocalhost = window.location.hostname.includes('localhost');
+        const API_BASE_URL = isLocalhost
+        ? 'http://localhost:3000/api'
+        :'https://cata-backend-5z45.onrender.com/api';
 
         async function fetchBookedTimes(date) {
             try {
