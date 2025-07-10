@@ -124,7 +124,7 @@
         }
 
         function renderAppointmentsTable(appointments) {
-            appointmentsTableBody.innerHTML = ''; // Limpiar la tabla
+            appointmentsTableBody.innerHTML = '';
 
             if (appointments.length === 0) {
                 appointmentsTableBody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-gray-500">No hay turnos agendados.</td></tr>';
@@ -132,10 +132,13 @@
             }
 
             appointments.forEach(appointment => {
-                // Formatear la fecha si existe, de lo contrario, mostrar "N/A"
-                const formattedDate = appointment.fecha ? `${appointment.fecha.split('-')[2]}/${appointment.fecha.split('-')[1]}/${appointment.fecha.split('-')[0]}` : 'N/A';
-                
-                // Mostrar la hora si existe, de lo contrario, mostrar "N/A"
+                // Modificación aquí para formatear la fecha y la hora
+                const dateObj = new Date(appointment.fecha);
+                const day = String(dateObj.getUTCDate()).padStart(2, '0');
+                const month = String(dateObj.getUTCMonth() + 1).padStart(2, '0');
+                const year = dateObj.getUTCFullYear();
+                const formattedDate = `${day}/${month}/${year}`;
+
                 const formattedTime = appointment.hora ? appointment.hora : 'N/A';
 
                 const row = document.createElement('tr');
@@ -172,7 +175,7 @@
                 }
 
                 showMessage('Turno eliminado con éxito.', 'success');
-                fetchAppointments(); // Volver a cargar los turnos para actualizar la tabla
+                fetchAppointments();
 
             } catch (error) {
                 console.error('Error al eliminar turno:', error);
@@ -182,15 +185,14 @@
             }
         }
 
-        // Delegación de eventos para los botones de eliminar
         appointmentsTableBody.addEventListener('click', (event) => {
-            if (event.target.classList.contains('delete-btn')) {
-                const idToDelete = event.target.dataset.id;
+            if (event.target.closest('.delete-btn')) {
+                const deleteButton = event.target.closest('.delete-btn');
+                const idToDelete = deleteButton.dataset.id;
                 deleteAppointment(idToDelete);
             }
         });
 
-        // Cargar turnos al cargar la página
         document.addEventListener('DOMContentLoaded', fetchAppointments);
     </script>
 </body>
