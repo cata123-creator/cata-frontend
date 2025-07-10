@@ -312,7 +312,7 @@
 
                         <div>
                             <label for="name" class="block text-gray-700 text-sm font-bold mb-2">Nombre Completo:</label>
-                            <input type="text" id="name" name="name" class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-pink-500 transition duration-300" placeholder="Tu nombre" required>
+                            <input type="text" id="nombre" name="nombre" class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-pink-500 transition duration-300" placeholder="Tu nombre" required>
                         </div>
                         <div>
                             <label for="telefono" class="block text-gray-700 text-sm font-bold mb-2">Teléfono:</label>
@@ -692,17 +692,14 @@
         formMessageEl.textContent = '';
 
         // CORREGIDO: Usamos los IDs que sí existen en tu HTML
-        const name = document.getElementById('name').value.trim();
+        const nombre = document.getElementById('nombre').value.trim();
         const telefono = document.getElementById('telefono').value.trim();
         const servicio = document.getElementById('service').value;
         const fecha = selectedDateInput.value;
         const hora = selectedTimeInput.value;
 
-        // Se usa un valor por defecto para 'email' ya que el campo no existe en el HTML
-        const email = "no-email@provided.com";
-
         let isValid = true;
-        if (!name || !telefono || !servicio || !fecha || !hora) {
+        if (!nombre || !telefono || !servicio || !fecha || !hora) {
             formMessageEl.classList.remove('hidden', 'bg-green-100', 'text-green-700', 'bg-blue-100', 'text-blue-700');
             formMessageEl.classList.add('bg-red-100', 'text-red-700');
             formMessageEl.textContent = 'Por favor, completa todos los campos obligatorios (Nombre, Teléfono, Servicio, Fecha y Horario).';
@@ -715,9 +712,9 @@
 
         // CORREGIDO: Los nombres de las propiedades coinciden con el backend
         const appointmentData = {
-            name: name,
-            phone: telefono, // El backend espera 'phone', usamos el valor de 'telefono'
-            service: servicio,
+            nombre: nombre,
+            telefono: telefono, // El backend espera 'phone', usamos el valor de 'telefono'
+            service: service,
             date: fecha,
             time: hora,
         };
