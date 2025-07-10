@@ -694,12 +694,12 @@
         // CORREGIDO: Usamos los IDs que sí existen en tu HTML
         const nombre = document.getElementById('nombre').value.trim();
         const telefono = document.getElementById('telefono').value.trim();
-        const servicio = document.getElementById('service').value;
+        const service = document.getElementById('service').value;
         const fecha = selectedDateInput.value;
         const hora = selectedTimeInput.value;
 
         let isValid = true;
-        if (!nombre || !telefono || !servicio || !fecha || !hora) {
+        if (!nombre || !telefono || !service || !fecha || !hora) {
             formMessageEl.classList.remove('hidden', 'bg-green-100', 'text-green-700', 'bg-blue-100', 'text-blue-700');
             formMessageEl.classList.add('bg-red-100', 'text-red-700');
             formMessageEl.textContent = 'Por favor, completa todos los campos obligatorios (Nombre, Teléfono, Servicio, Fecha y Horario).';
