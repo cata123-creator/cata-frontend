@@ -28,57 +28,28 @@
             overflow-x: auto;
             border: 1px solid #fbcfe8; /* Light pink border */
             border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background-color: #fff;
+        .message-box {
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 20px;
         }
-        th, td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid #fbcfe8;
+        .message-box.success {
+            background-color: #d4edda;
+            color: #155724;
         }
-        th {
-            background-color: #f8bbd0; /* Soft pink header */
-            color: #880e4f; /* Dark purple pink */
-        }
-        tr:hover {
-            background-color: #fdedf0; /* Lighter pink on hover */
-        }
-        .action-btns button {
-            padding: 6px 12px;
-            border-radius: 5px;
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        .delete-btn {
-            background-color: #ffcdd2;
-            color: #c62828;
-        }
-        .delete-btn:hover {
-            background-color: #ef9a9a;
-        }
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(255, 255, 255, 0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
+        .message-box.error {
+            background-color: #f8d7da;
+            color: #721c24;
         }
         .loading-spinner {
-            border: 8px solid #f3f3f3;
-            border-top: 8px solid #d81b60;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #d81b60;
             border-radius: 50%;
-            width: 60px;
-            height: 60px;
+            width: 30px;
+            height: 30px;
             animation: spin 1s linear infinite;
         }
         @keyframes spin {
@@ -88,105 +59,96 @@
         .hidden {
             display: none;
         }
-        .message {
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 20px;
-            text-align: center;
-            font-weight: bold;
-        }
-        .message.success {
-            background-color: #e8f5e9;
-            color: #2e7d32;
-        }
-        .message.error {
-            background-color: #ffebee;
-            color: #c62828;
-        }
     </style>
 </head>
 <body>
-    <div class="loading-overlay hidden" id="loadingOverlay">
-        <div class="loading-spinner"></div>
-    </div>
+
     <div class="container">
-        <h1>Gestión de Turnos</h1>
+        <h1 class="text-3xl font-bold">Gestión de Turnos</h1>
+
+        <div id="message-container" class="mb-4"></div>
+
         <div class="table-container">
-            <table id="appointmentsTable" class="min-w-full">
-                <thead>
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
                     <tr>
-                        <th class="py-2 px-4 border-b">Fecha</th>
-                        <th class="py-2 px-4 border-b">Hora</th>
-                        <th class="py-2 px-4 border-b">Nombre</th>
-                        <th class="py-2 px-4 border-b">Servicio</th>
-                        <th class="py-2 px-4 border-b">Email</th>
-                        <th class="py-2 px-4 border-b">Acciones</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Teléfono</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Servicio</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hora</th>
+                        <th class="px-6 py-3 text-right text-sm font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
                     </tr>
                 </thead>
-                <tbody id="appointmentsTableBody">
-                    </tbody>
+                <tbody id="appointments-table-body" class="bg-white divide-y divide-gray-200">
+                    <tr><td colspan="6" class="text-center py-4 text-gray-500">Cargando turnos...</td></tr>
+                </tbody>
             </table>
         </div>
-        <div id="message" class="message hidden"></div>
+
+        <div class="flex justify-center mt-6">
+            <div id="loading-spinner" class="loading-spinner hidden"></div>
+        </div>
     </div>
 
     <script>
         const API_URL = 'https://cata-backend-5z45.onrender.com/api/appointments';
-        const appointmentsTableBody = document.getElementById('appointmentsTableBody');
-        const messageEl = document.getElementById('message');
-        const loadingOverlay = document.getElementById('loadingOverlay');
+        const appointmentsTableBody = document.getElementById('appointments-table-body');
+        const messageContainer = document.getElementById('message-container');
+        const loadingSpinner = document.getElementById('loading-spinner');
 
-        function showLoading() {
-            loadingOverlay.classList.remove('hidden');
-        }
-
-        function hideLoading() {
-            loadingOverlay.classList.add('hidden');
-        }
-
-        function showMessage(text, type) {
-            messageEl.textContent = text;
-            messageEl.className = `message ${type}`;
+        function showMessage(message, type) {
+            const messageEl = document.createElement('div');
+            messageEl.className = `message-box ${type}`;
+            messageEl.textContent = message;
+            messageContainer.innerHTML = '';
+            messageContainer.appendChild(messageEl);
         }
 
         async function fetchAppointments() {
-            showLoading();
+            loadingSpinner.classList.remove('hidden');
+            appointmentsTableBody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-gray-500">Cargando turnos...</td></tr>';
             try {
                 const response = await fetch(API_URL);
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    throw new Error('No se pudieron obtener los turnos.');
                 }
                 const appointments = await response.json();
                 renderAppointmentsTable(appointments);
             } catch (error) {
                 console.error('Error al obtener los turnos:', error);
-                showMessage(`Error al cargar los turnos: ${error.message}.`, 'error');
+                appointmentsTableBody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-red-500">Error al cargar los turnos. Por favor, intente de nuevo.</td></tr>`;
             } finally {
-                hideLoading();
+                loadingSpinner.classList.add('hidden');
             }
         }
 
         function renderAppointmentsTable(appointments) {
-            appointmentsTableBody.innerHTML = '';
+            appointmentsTableBody.innerHTML = ''; // Limpiar la tabla
+
             if (appointments.length === 0) {
-                appointmentsTableBody.innerHTML = '<tr><td colspan="6" class="text-center">No hay turnos agendados.</td></tr>';
+                appointmentsTableBody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-gray-500">No hay turnos agendados.</td></tr>';
                 return;
             }
-            appointments.forEach(appointment => {
-                const row = document.createElement('tr');
-                
-                // Formateo la fecha para evitar problemas de zona horaria
-                const dateParts = appointment.date.split('-');
-                const formattedDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
 
+            appointments.forEach(appointment => {
+                // Formatear la fecha si existe, de lo contrario, mostrar "N/A"
+                const formattedDate = appointment.fecha ? `${appointment.fecha.split('-')[2]}/${appointment.fecha.split('-')[1]}/${appointment.fecha.split('-')[0]}` : 'N/A';
+                
+                // Mostrar la hora si existe, de lo contrario, mostrar "N/A"
+                const formattedTime = appointment.hora ? appointment.hora : 'N/A';
+
+                const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${formattedDate}</td>
-                    <td>${appointment.time}</td>
-                    <td>${appointment.name}</td>
-                    <td>${appointment.service}</td>
-                    <td>${appointment.email}</td>
-                    <td class="action-btns">
-                        <button class="delete-btn" data-id="${appointment.id}">Eliminar</button>
+                    <td class="px-6 py-4 whitespace-nowrap">${appointment.nombre}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">${appointment.telefono}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">${appointment.servicio}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">${formattedDate}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">${formattedTime}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button data-id="${appointment.id}" class="delete-btn text-red-600 hover:text-red-900 transition-colors duration-200">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
                     </td>
                 `;
                 appointmentsTableBody.appendChild(row);
@@ -198,7 +160,7 @@
                 return;
             }
 
-            showLoading();
+            loadingSpinner.classList.remove('hidden');
             try {
                 const response = await fetch(`${API_URL}/${id}`, {
                     method: 'DELETE'
@@ -210,15 +172,17 @@
                 }
 
                 showMessage('Turno eliminado con éxito.', 'success');
-                fetchAppointments();
+                fetchAppointments(); // Volver a cargar los turnos para actualizar la tabla
+
             } catch (error) {
                 console.error('Error al eliminar turno:', error);
                 showMessage(`Error al eliminar turno: ${error.message}.`, 'error');
             } finally {
-                hideLoading();
+                loadingSpinner.classList.add('hidden');
             }
         }
 
+        // Delegación de eventos para los botones de eliminar
         appointmentsTableBody.addEventListener('click', (event) => {
             if (event.target.classList.contains('delete-btn')) {
                 const idToDelete = event.target.dataset.id;
@@ -226,6 +190,7 @@
             }
         });
 
+        // Cargar turnos al cargar la página
         document.addEventListener('DOMContentLoaded', fetchAppointments);
     </script>
 </body>
