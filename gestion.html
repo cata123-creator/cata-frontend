@@ -28,171 +28,177 @@
             overflow-x: auto;
             border: 1px solid #fbcfe8; /* Light pink border */
             border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
         table {
             width: 100%;
             border-collapse: collapse;
+            background-color: #fff;
         }
         th, td {
-            text-align: left;
             padding: 12px 15px;
-            border-bottom: 1px solid #fce4ec; /* Lighter pink border */
+            text-align: left;
+            border-bottom: 1px solid #fbcfe8;
         }
         th {
             background-color: #f8bbd0; /* Soft pink header */
-            color: #880e4f; /* Darker pink text */
-            font-weight: 600;
-            text-transform: uppercase;
+            color: #880e4f; /* Dark purple pink */
         }
         tr:hover {
-            background-color: #fce4ec; /* Hover effect */
+            background-color: #fdedf0; /* Lighter pink on hover */
         }
-        .btn-primary {
-            background-color: #e91e63; /* Medium pink */
-            color: white;
-            padding: 8px 15px;
+        .action-btns button {
+            padding: 6px 12px;
             border-radius: 5px;
+            border: none;
+            cursor: pointer;
             transition: background-color 0.3s ease;
         }
-        .btn-primary:hover {
-            background-color: #c2185b; /* Darker pink on hover */
+        .delete-btn {
+            background-color: #ffcdd2;
+            color: #c62828;
         }
-        .message {
-            padding: 10px;
-            margin-bottom: 15px;
-            border-radius: 8px;
-            font-weight: 500;
+        .delete-btn:hover {
+            background-color: #ef9a9a;
         }
-        .message.success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        .message.error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        .hidden {
-            display: none;
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
         }
         .loading-spinner {
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            border-left-color: #e91e63;
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #d81b60;
             border-radius: 50%;
-            width: 30px;
-            height: 30px;
+            width: 60px;
+            height: 60px;
             animation: spin 1s linear infinite;
-            margin: 20px auto;
         }
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-
-        /* FIX PARA EL PROBLEMA DE VISUALIZACIÓN DE LAS FILAS DE LA TABLA */
-        tr {
-            display: table-row !important; /* Asegura que las filas se comporten como filas de tabla */
+        .hidden {
+            display: none;
+        }
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .message.success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+        .message.error {
+            background-color: #ffebee;
+            color: #c62828;
         }
     </style>
 </head>
 <body>
+    <div class="loading-overlay hidden" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
     <div class="container">
-        <h1 class="text-3xl font-bold">Gestión de Turnos Agendados</h1>
-        <div id="message" class="message hidden"></div>
-
-        <div class="table-container mt-8">
-            <table class="min-w-full bg-white border border-gray-200 shadow-sm rounded-lg overflow-hidden">
+        <h1>Gestión de Turnos</h1>
+        <div class="table-container">
+            <table id="appointmentsTable" class="min-w-full">
                 <thead>
-                    <tr class="bg-purple-100 text-purple-700 uppercase text-sm leading-normal">
-                        <th class="py-3 px-6 text-left">ID</th>
-                        <th class="py-3 px-6 text-left">Nombre</th>
-                        <th class="py-3 px-6 text-left">Teléfono</th>
-                        <th class="py-3 px-6 text-left">Servicio</th>
-                        <th class="py-3 px-6 text-left">Fecha</th>
-                        <th class="py-3 px-6 text-left">Hora</th>
-                        <th class="py-3 px-6 text-left">Mensaje</th>
-                        <th class="py-3 px-6 text-center">Acciones</th>
+                    <tr>
+                        <th class="py-2 px-4 border-b">Fecha</th>
+                        <th class="py-2 px-4 border-b">Hora</th>
+                        <th class="py-2 px-4 border-b">Nombre</th>
+                        <th class="py-2 px-4 border-b">Servicio</th>
+                        <th class="py-2 px-4 border-b">Email</th>
+                        <th class="py-2 px-4 border-b">Acciones</th>
                     </tr>
                 </thead>
-                <tbody id="appointmentsTableBody" class="text-gray-600 text-sm font-light">
+                <tbody id="appointmentsTableBody">
                     </tbody>
             </table>
-            <div id="loadingSpinner" class="loading-spinner hidden"></div>
         </div>
+        <div id="message" class="message hidden"></div>
     </div>
 
     <script>
         const API_URL = 'https://cata-backend-5z45.onrender.com/api/appointments';
         const appointmentsTableBody = document.getElementById('appointmentsTableBody');
         const messageEl = document.getElementById('message');
-        const loadingSpinner = document.getElementById('loadingSpinner');
+        const loadingOverlay = document.getElementById('loadingOverlay');
 
-        function showMessage(msg, type) {
-            messageEl.classList.remove('hidden', 'success', 'error');
-            messageEl.classList.add(type);
-            messageEl.textContent = msg;
-            setTimeout(() => {
-                messageEl.classList.add('hidden');
-            }, 3000);
+        function showLoading() {
+            loadingOverlay.classList.remove('hidden');
+        }
+
+        function hideLoading() {
+            loadingOverlay.classList.add('hidden');
+        }
+
+        function showMessage(text, type) {
+            messageEl.textContent = text;
+            messageEl.className = `message ${type}`;
         }
 
         async function fetchAppointments() {
-            loadingSpinner.classList.remove('hidden');
+            showLoading();
             try {
                 const response = await fetch(API_URL);
                 if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 const appointments = await response.json();
-                renderAppointments(appointments);
+                renderAppointmentsTable(appointments);
             } catch (error) {
-                console.error('Error al cargar turnos:', error);
-                showMessage(`Error al cargar turnos: ${error.message}.`, 'error');
+                console.error('Error al obtener los turnos:', error);
+                showMessage(`Error al cargar los turnos: ${error.message}.`, 'error');
             } finally {
-                loadingSpinner.classList.add('hidden');
+                hideLoading();
             }
         }
 
-        function renderAppointments(appointments) {
-            console.log('[DEBUG] Iniciando renderAppointments. Turnos recibidos:', appointments); // NUEVO LOG 1
-            appointmentsTableBody.innerHTML = ''; // Limpiar filas existentes
-
+        function renderAppointmentsTable(appointments) {
+            appointmentsTableBody.innerHTML = '';
             if (appointments.length === 0) {
-                appointmentsTableBody.innerHTML = '<tr><td colspan="8" class="py-3 px-6 text-center">No hay turnos agendados.</td></tr>';
-                console.log('[DEBUG] No hay turnos agendados, mostrando mensaje.'); // NUEVO LOG 2
+                appointmentsTableBody.innerHTML = '<tr><td colspan="6" class="text-center">No hay turnos agendados.</td></tr>';
                 return;
             }
-
             appointments.forEach(appointment => {
-                console.log('[DEBUG] Procesando turno:', appointment); // NUEVO LOG 3
                 const row = document.createElement('tr');
-                row.classList.add('border-b', 'border-gray-200', 'hover:bg-gray-100');
+                
+                // Formateo la fecha para evitar problemas de zona horaria
+                const dateParts = appointment.date.split('-');
+                const formattedDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+
                 row.innerHTML = `
-                    <td class="py-3 px-6 text-left whitespace-nowrap">${appointment.id}</td>
-                    <td class="py-3 px-6 text-left">${appointment.nombre}</td>
-                    <td class="py-3 px-6 text-left">${appointment.telefono}</td>
-                    <td class="py-3 px-6 text-left">${appointment.servicio}</td>
-                    <td class="py-3 px-6 text-left">${new Date(appointment.fecha).toLocaleDateString('es-AR')}</td>
-                    <td class="py-3 px-6 text-left">${appointment.hora}</td>
-                    <td class="py-3 px-6 text-left">${appointment.message || ''}</td>
-                    <td class="py-3 px-6 text-center">
-                        <button class="delete-btn bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-xs" data-id="${appointment.id}">Eliminar</button>
+                    <td>${formattedDate}</td>
+                    <td>${appointment.time}</td>
+                    <td>${appointment.name}</td>
+                    <td>${appointment.service}</td>
+                    <td>${appointment.email}</td>
+                    <td class="action-btns">
+                        <button class="delete-btn" data-id="${appointment.id}">Eliminar</button>
                     </td>
                 `;
                 appointmentsTableBody.appendChild(row);
-                console.log('[DEBUG] Turno añadido a la tabla.'); // NUEVO LOG 4
             });
-            console.log('[DEBUG] renderAppointments finalizado.'); // NUEVO LOG 5
         }
 
         async function deleteAppointment(id) {
             if (!confirm('¿Estás seguro de que quieres eliminar este turno? Esta acción no se puede deshacer.')) {
-                return; // Si el usuario cancela, no hacemos nada
+                return;
             }
 
-            loadingSpinner.classList.remove('hidden');
+            showLoading();
             try {
                 const response = await fetch(`${API_URL}/${id}`, {
                     method: 'DELETE'
@@ -204,17 +210,15 @@
                 }
 
                 showMessage('Turno eliminado con éxito.', 'success');
-                fetchAppointments(); // Volver a cargar los turnos para actualizar la tabla
-
+                fetchAppointments();
             } catch (error) {
                 console.error('Error al eliminar turno:', error);
                 showMessage(`Error al eliminar turno: ${error.message}.`, 'error');
             } finally {
-                loadingSpinner.classList.add('hidden');
+                hideLoading();
             }
         }
 
-        // Delegación de eventos para los botones de eliminar
         appointmentsTableBody.addEventListener('click', (event) => {
             if (event.target.classList.contains('delete-btn')) {
                 const idToDelete = event.target.dataset.id;
@@ -222,7 +226,6 @@
             }
         });
 
-        // Cargar turnos al cargar la página
         document.addEventListener('DOMContentLoaded', fetchAppointments);
     </script>
 </body>
