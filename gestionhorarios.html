@@ -220,10 +220,10 @@
         async function fetchSchedules() {
             showLoading();
             try {
-                // RUTA CORREGIDA: Tu servidor no tiene una ruta para GET /api/schedules.
+                // RUTA NO EXISTENTE: Tu servidor no tiene una ruta para GET /api/schedules.
                 // Esta llamada dará un 404. Si quieres una lista completa,
                 // necesitas añadir una ruta en tu server.js.
-                // Puedes usar GET /api/available-times/:date para obtener horarios para una fecha.
+                // Si solo quieres ver un horario, deberás modificar la lógica para solicitar una fecha.
                 const response = await fetch(`${API_BASE_URL}/api/schedules`);
                 
                 if (!response.ok) {
