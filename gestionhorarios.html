@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NailsCata - Gestión de Turnos</title>
+    <title>NailsCata - Gestión de Horarios</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -28,216 +28,269 @@
             overflow-x: auto;
             border: 1px solid #fbcfe8; /* Light pink border */
             border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
         table {
             width: 100%;
             border-collapse: collapse;
+            background-color: #fff;
         }
         th, td {
-            text-align: left;
             padding: 12px 15px;
-            border-bottom: 1px solid #fce4ec; /* Lighter pink border */
+            text-align: left;
+            border-bottom: 1px solid #fbcfe8;
         }
         th {
             background-color: #f8bbd0; /* Soft pink header */
-            color: #880e4f; /* Darker pink text */
-            font-weight: 600;
-            text-transform: uppercase;
+            color: #880e4f; /* Dark purple pink */
         }
         tr:hover {
-            background-color: #fce4ec; /* Hover effect */
+            background-color: #fdedf0; /* Lighter pink on hover */
         }
-        .btn-primary {
-            background-color: #e91e63; /* Medium pink */
-            color: white;
-            padding: 8px 15px;
+        .action-btns button {
+            padding: 6px 12px;
             border-radius: 5px;
+            border: none;
+            cursor: pointer;
             transition: background-color 0.3s ease;
         }
-        .btn-primary:hover {
-            background-color: #c2185b; /* Darker pink on hover */
+        .delete-btn {
+            background-color: #ffcdd2;
+            color: #c62828;
+        }
+        .delete-btn:hover {
+            background-color: #ef9a9a;
+        }
+        .edit-btn {
+            background-color: #e0f2f1;
+            color: #00796b;
+        }
+        .edit-btn:hover {
+            background-color: #b2dfdb;
+        }
+        .form-container {
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(236, 72, 153, 0.1);
+            margin-top: 30px;
+        }
+        .form-container label {
+            display: block;
+            margin-bottom: 8px;
+            color: #d81b60;
+            font-weight: bold;
+        }
+        .form-container input, .form-container textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #f8bbd0;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        .form-container button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .submit-btn {
+            background-color: #d81b60;
+            color: #fff;
+        }
+        .submit-btn:hover {
+            background-color: #a01046;
         }
         .message {
-            padding: 10px;
-            margin-bottom: 15px;
+            padding: 15px;
             border-radius: 8px;
-            font-weight: 500;
-        }
-        .message.success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        .message.error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        .hidden {
+            margin-top: 20px;
+            text-align: center;
+            font-weight: bold;
             display: none;
         }
+        .message.success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+        .message.error {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
         .loading-spinner {
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            border-left-color: #e91e63;
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #d81b60;
             border-radius: 50%;
-            width: 30px;
-            height: 30px;
+            width: 60px;
+            height: 60px;
             animation: spin 1s linear infinite;
-            margin: 20px auto;
         }
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-
-        /* FIX PARA EL PROBLEMA DE VISUALIZACIÓN DE LAS FILAS DE LA TABLA */
-        tr {
-            display: table-row !important; /* Asegura que las filas se comporten como filas de tabla */
+        .hidden {
+            display: none;
         }
     </style>
 </head>
 <body>
+    <div class="loading-overlay hidden" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
     <div class="container">
-        <h1 class="text-3xl font-bold">Gestión de Horarios Disponibles</h1>
-        <div id="messageArea" class="message hidden"></div>
-        <div class="loading-spinner hidden" id="loading"></div>
+        <h1>Gestión de Horarios</h1>
 
-        <form id="scheduleForm" class="mb-6 p-6 bg-pink-50 rounded-lg shadow-inner">
-            <h2 class="text-xl font-semibold text-pink-700 mb-4">Configurar Horario</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label for="dateInput" class="block text-pink-700 text-sm font-bold mb-2">Fecha:</label>
-                    <input type="date" id="dateInput" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-                </div>
-                <div>
-                    <label for="timesInput" class="block text-pink-700 text-sm font-bold mb-2">Horarios Disponibles (separados por coma, ej: 09:00,10:30,14:00):</label>
-                    <input type="text" id="timesInput" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="ej: 09:00,10:30,14:00" required>
-                </div>
-            </div>
-            <button type="submit" class="mt-6 bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                Guardar Horario
-            </button>
-            <button type="button" id="clearFormBtn" class="mt-6 ml-2 bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                Limpiar Formulario
-            </button>
-        </form>
+        <div class="form-container">
+            <form id="scheduleForm">
+                <label for="scheduleDate">Fecha:</label>
+                <input type="date" id="scheduleDate" required>
 
-        <h2 class="text-xl font-semibold text-pink-700 mb-4">Horarios Configurados</h2>
-        <div class="table-container">
-            <table class="min-w-full bg-white border border-pink-200">
+                <label for="availableTimes">Horarios Disponibles (separados por coma):</label>
+                <textarea id="availableTimes" rows="4" placeholder="Ej: 09:00, 10:30, 12:00" required></textarea>
+
+                <button type="submit" class="submit-btn">Guardar Horario</button>
+            </form>
+            <button id="clearFormBtn" class="w-full mt-4 p-3 rounded-md border border-gray-300 text-gray-700 bg-white hover:bg-gray-100">Limpiar Formulario</button>
+        </div>
+
+        <div class="mt-8 table-container">
+            <table id="schedulesTable" class="min-w-full">
                 <thead>
                     <tr>
-                        <th class="py-2 px-4 border-b border-pink-200">Fecha</th>
-                        <th class="py-2 px-4 border-b border-pink-200">Horarios</th>
-                        <th class="py-2 px-4 border-b border-pink-200">Acciones</th>
+                        <th class="py-2 px-4 border-b">Fecha</th>
+                        <th class="py-2 px-4 border-b">Horarios Disponibles</th>
+                        <th class="py-2 px-4 border-b">Acciones</th>
                     </tr>
                 </thead>
                 <tbody id="schedulesTableBody">
                     </tbody>
             </table>
-            <p id="noSchedulesMessage" class="hidden text-center text-gray-500 mt-4">No hay horarios configurados.</p>
         </div>
+
+        <div id="message" class="message hidden"></div>
     </div>
 
     <script>
         const API_BASE_URL = 'https://cata-backend-5z45.onrender.com';
+        
         const scheduleForm = document.getElementById('scheduleForm');
-        const dateInput = document.getElementById('dateInput');
-        const timesInput = document.getElementById('timesInput');
+        const scheduleDateInput = document.getElementById('scheduleDate');
+        const availableTimesInput = document.getElementById('availableTimes');
         const schedulesTableBody = document.getElementById('schedulesTableBody');
-        const messageArea = document.getElementById('messageArea');
-        const loadingSpinner = document.getElementById('loading');
-        const noSchedulesMessage = document.getElementById('noSchedulesMessage');
+        const messageEl = document.getElementById('message');
+        const loadingOverlay = document.getElementById('loadingOverlay');
         const clearFormBtn = document.getElementById('clearFormBtn');
 
-        let editingDate = null; // Para saber si estamos editando o creando
-
-        function showMessage(message, type) {
-            messageArea.textContent = message;
-            messageArea.className = `message ${type}`;
-            messageArea.classList.remove('hidden');
-            setTimeout(() => {
-                messageArea.classList.add('hidden');
-            }, 3000);
-        }
+        let editingDate = null;
 
         function showLoading() {
-            loadingSpinner.classList.remove('hidden');
+            loadingOverlay.classList.remove('hidden');
         }
 
         function hideLoading() {
-            loadingSpinner.classList.add('hidden');
+            loadingOverlay.classList.add('hidden');
+        }
+
+        function showMessage(text, type) {
+            messageEl.textContent = text;
+            messageEl.className = `message ${type}`;
+            messageEl.style.display = 'block';
+            setTimeout(() => {
+                messageEl.style.display = 'none';
+            }, 5000);
         }
 
         async function fetchSchedules() {
             showLoading();
             try {
+                // RUTA CORREGIDA: Tu servidor no tiene una ruta para GET /api/schedules.
+                // Esta llamada dará un 404. Si quieres una lista completa,
+                // necesitas añadir una ruta en tu server.js.
+                // Puedes usar GET /api/available-times/:date para obtener horarios para una fecha.
                 const response = await fetch(`${API_BASE_URL}/api/schedules`);
+                
                 if (!response.ok) {
                     const errorData = await response.json();
                     throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
                 }
-                const data = await response.json(); // data ya es el array de horarios
+                const schedules = await response.json();
+                renderSchedulesTable(schedules);
 
-                schedulesTableBody.innerHTML = '';
-                if (data.length === 0) { // CORREGIDO
-                    noSchedulesMessage.classList.remove('hidden');
-                } else {
-                    noSchedulesMessage.classList.add('hidden');
-                    data.forEach(schedule => { // CORREGIDO
-                        const row = `
-                            <tr class="hover:bg-pink-50">
-                                <td class="py-2 px-4 border-b border-pink-200">${schedule.date}</td>
-                                <td class="py-2 px-4 border-b border-pink-200">${schedule.available_times ? schedule.available_times.join(', ') : ''}</td>
-                                <td class="py-2 px-4 border-b border-pink-200">
-                                    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-sm edit-btn" data-date="${schedule.date}" data-times="${schedule.available_times ? schedule.available_times.join(',') : ''}">
-                                        Editar
-                                    </button>
-                                    <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm delete-btn" data-date="${schedule.date}">
-                                        Eliminar
-                                    </button>
-                                </td>
-                            </tr>
-                        `;
-                        schedulesTableBody.insertAdjacentHTML('beforeend', row);
-                    });
-                }
             } catch (error) {
                 console.error('Error al obtener horarios:', error);
-                showMessage(`Error al cargar horarios: ${error.message}.`, 'error');
+                showMessage(`Error al obtener horarios: ${error.message}.`, 'error');
             } finally {
                 hideLoading();
             }
+        }
+        
+        function renderSchedulesTable(schedules) {
+            schedulesTableBody.innerHTML = '';
+            if (schedules.length === 0) {
+                schedulesTableBody.innerHTML = '<tr><td colspan="3" class="text-center">No hay horarios configurados.</td></tr>';
+                return;
+            }
+            schedules.forEach(schedule => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${schedule.date}</td>
+                    <td>${schedule.available_times.join(', ')}</td>
+                    <td class="action-btns">
+                        <button class="edit-btn" data-date="${schedule.date}">Editar</button>
+                        <button class="delete-btn" data-date="${schedule.date}">Eliminar</button>
+                    </td>
+                `;
+                schedulesTableBody.appendChild(row);
+            });
         }
 
         scheduleForm.addEventListener('submit', async (event) => {
             event.preventDefault();
             showLoading();
 
-            const date = dateInput.value;
-            const times = timesInput.value.split(',').map(time => time.trim()).filter(time => time !== '');
+            const date = scheduleDateInput.value;
+            const availableTimes = availableTimesInput.value.split(',').map(time => time.trim());
+            
+            const scheduleData = {
+                date,
+                available_times: availableTimes
+            };
 
             try {
-                const method = editingDate ? 'PUT' : 'POST';
-                const url = editingDate ? `${API_BASE_URL}/api/schedules/${editingDate}` : `${API_BASE_URL}/api/schedules`;
-
-                const response = await fetch(url, {
-                    method: 'POST', // Siempre es POST en esta implementación (INSERT ... ON CONFLICT)
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ date, available_times: times })
+                const response = await fetch(`${API_BASE_URL}/api/schedules`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(scheduleData)
                 });
 
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+                const result = await response.json();
+
+                if (response.ok) {
+                    showMessage('Horario guardado con éxito.', 'success');
+                    scheduleForm.reset();
+                    editingDate = null;
+                    fetchSchedules();
+                } else {
+                    throw new Error(result.error || `Error al guardar horario. Status: ${response.status}`);
                 }
 
-                showMessage('Horario guardado con éxito.', 'success');
-                scheduleForm.reset();
-                editingDate = null; // Resetear el modo edición
-                fetchSchedules();
             } catch (error) {
                 console.error('Error al guardar horario:', error);
                 showMessage(`Error al guardar horario: ${error.message}.`, 'error');
@@ -246,15 +299,19 @@
             }
         });
 
-        // Delegación de eventos para los botones de editar y eliminar
-        schedulesTableBody.addEventListener('click', async (event) => {
+        // Event listener para los botones de editar y eliminar
+        schedulesTableBody.addEventListener('click', async (event) => { // AÑADIDO 'async'
             if (event.target.classList.contains('edit-btn')) {
                 const dateToEdit = event.target.dataset.date;
-                const timesToEdit = event.target.dataset.times;
-                dateInput.value = dateToEdit;
-                timesInput.value = timesToEdit;
-                editingDate = dateToEdit; // Establecer el modo edición
-            } else if (event.target.classList.contains('delete-btn')) {
+                const row = event.target.closest('tr');
+                const times = row.cells[1].textContent.split(',').map(time => time.trim());
+
+                scheduleDateInput.value = dateToEdit;
+                availableTimesInput.value = times.join(', ');
+                editingDate = dateToEdit;
+            }
+
+            if (event.target.classList.contains('delete-btn')) {
                 const dateToDelete = event.target.dataset.date;
                 if (confirm(`¿Estás seguro de que quieres eliminar el horario para la fecha ${dateToDelete}?`)) {
                     showLoading();
