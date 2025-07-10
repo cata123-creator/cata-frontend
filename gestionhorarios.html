@@ -220,10 +220,6 @@
         async function fetchSchedules() {
             showLoading();
             try {
-                // RUTA NO EXISTENTE: Tu servidor no tiene una ruta para GET /api/schedules.
-                // Esta llamada dará un 404. Si quieres una lista completa,
-                // necesitas añadir una ruta en tu server.js.
-                // Si solo quieres ver un horario, deberás modificar la lógica para solicitar una fecha.
                 const response = await fetch(`${API_BASE_URL}/api/schedules`);
                 
                 if (!response.ok) {
@@ -299,8 +295,7 @@
             }
         });
 
-        // Event listener para los botones de editar y eliminar
-        schedulesTableBody.addEventListener('click', async (event) => { // AÑADIDO 'async'
+        schedulesTableBody.addEventListener('click', async (event) => {
             if (event.target.classList.contains('edit-btn')) {
                 const dateToEdit = event.target.dataset.date;
                 const row = event.target.closest('tr');
@@ -342,8 +337,8 @@
             editingDate = null;
         });
 
-        // Cargar horarios al cargar la página
-        document.addEventListener('DOMContentLoaded', fetchSchedules);
+        // He quitado la llamada automática a fetchSchedules para evitar el error 404, ya que el servidor no tiene esa ruta.
+        // document.addEventListener('DOMContentLoaded', fetchSchedules);
     </script>
 </body>
 </html>
