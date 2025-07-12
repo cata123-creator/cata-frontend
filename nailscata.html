@@ -685,78 +685,71 @@
     const appointmentForm = document.getElementById('appointmentForm');
     const formMessageEl = document.getElementById('formMessage');
 
-    appointmentForm.addEventListener('submit', async(e) => {
-        e.preventDefault();
+appointmentForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    formMessageEl.classList.add('hidden');
+    formMessageEl.textContent = '';
 
-        formMessageEl.classList.add('hidden');
-        formMessageEl.textContent = '';
+    const nombre = document.getElementById('nombre').value.trim();
+    const telefono = document.getElementById('telefono').value.trim();
+    const service = document.getElementById('service').value;
+    const fecha = selectedDateInput.value;
+    const hora = selectedTimeInput.value;
 
-        // CORREGIDO: Usamos los IDs que sí existen en tu HTML
-        const nombre = document.getElementById('nombre').value.trim();
-        const telefono = document.getElementById('telefono').value.trim();
-        const service = document.getElementById('service').value;
-        const fecha = selectedDateInput.value;
-        const hora = selectedTimeInput.value;
+    if (!nombre || !telefono || !service || !fecha || !hora) {
+        formMessageEl.classList.remove('hidden');
+        formMessageEl.classList.add('bg-red-100', 'text-red-700');
+        formMessageEl.textContent = 'Por favor, completa todos los campos obligatorios.';
+        return;
+    }
 
-        let isValid = true;
-        if (!nombre || !telefono || !service || !fecha || !hora) {
-            formMessageEl.classList.remove('hidden', 'bg-green-100', 'text-green-700', 'bg-blue-100', 'text-blue-700');
-            formMessageEl.classList.add('bg-red-100', 'text-red-700');
-            formMessageEl.textContent = 'Por favor, completa todos los campos obligatorios (Nombre, Teléfono, Servicio, Fecha y Horario).';
-            isValid = false;
-        }
+    const appointmentData = { nombre, telefono, service, date: fecha, time: hora };
 
-        if (!isValid) {
-            return;
-        }
-        // CORREGIDO: Los nombres de las propiedades coinciden con el backend
-        const appointmentData = {
-            nombre: nombre,
-            telefono: telefono, // El backend espera 'phone', usamos el valor de 'telefono'
-            service: service,
-            date: fecha,
-            time: hora,
-        };
-        console.log("DEBUG: Datos de la cita a enviar:", appointmentData);
+    try {
+        formMessageEl.classList.remove('hidden');
+        formMessageEl.classList.add('bg-blue-100', 'text-blue-700');
+        formMessageEl.textContent = 'Agendando tu cita...';
 
-        try {
-            formMessageEl.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'bg-green-100', 'text-green-700');
-            formMessageEl.classList.add('bg-blue-100', 'text-blue-700');
-            formMessageEl.textContent = 'Agendando tu cita...';
+        const response = await fetch(`${API_BASE_URL}/appointments`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(appointmentData)
+        });
 
-            const response = await fetch(`${API_BASE_URL}/appointments`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(appointmentData)
-            });
+        const result = await response.json();
 
-            const result = await response.json();
-            console.log('Respuesta del servidor:', result);
+        if (response.ok) {
+            appointmentForm.reset();
+            selectedDateInput.value = '';
+            selectedTimeInput.value = '';
 
-            if (response.ok) {
-                appointmentForm.reset();
-                selectedDateInput.value = '';
-                selectedTimeInput.value = '';
-                await renderCalendar();
-                formMessageEl.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'bg-blue-100', 'text-blue-700');
-                formMessageEl.classList.add('bg-green-100', 'text-green-700');
-                formMessageEl.textContent = 'Cita agendada con éxito. ¡Gracias por tu reserva!';
-            } else {
-                formMessageEl.classList.remove('hidden', 'bg-blue-100', 'text-blue-700', 'bg-green-100', 'text-green-700');
-                formMessageEl.classList.add('bg-red-100', 'text-red-700');
-                formMessageEl.textContent = result.error || 'Error al agendar la cita. Por favor, intenta de nuevo.';
-                console.error('Error al agendar:', result.error || 'Error desconocido');
+            await renderCalendar();
+            await fetchAvailableTimes(fecha); // ✅ Nueva línea
+
+            // ✅ Nueva lógica para marcar el botón como reservado
+            const justBooked = document.querySelector(`.time-slot[data-time="${hora}"]`);
+            if (justBooked) {
+                justBooked.classList.add('booked');
+                justBooked.classList.remove('selected-time');
+                justBooked.disabled = true;
             }
 
-        } catch (error) {
-            console.error('Error de red o de servidor:', error);
-            formMessageEl.classList.remove('hidden', 'bg-blue-100', 'text-blue-700', 'bg-green-100', 'text-green-700');
+            formMessageEl.classList.remove('bg-blue-100', 'text-blue-700');
+            formMessageEl.classList.add('bg-green-100', 'text-green-700');
+            formMessageEl.textContent = 'Cita agendada con éxito. ¡Gracias por tu reserva!';
+        } else {
+            formMessageEl.classList.remove('bg-blue-100', 'text-blue-700');
             formMessageEl.classList.add('bg-red-100', 'text-red-700');
-            formMessageEl.textContent = `Error de conexión: ${error.message}. Por favor, verifica tu conexión o intenta más tarde.`;
+            formMessageEl.textContent = result.error || 'Error al agendar la cita.';
         }
-    });
+
+    } catch (error) {
+        formMessageEl.classList.remove('bg-blue-100', 'text-blue-700');
+        formMessageEl.classList.add('bg-red-100', 'text-red-700');
+        formMessageEl.textContent = `Error: ${error.message}`;
+    }
+});
+
 </script>
 </body>
 </html>
